@@ -1,0 +1,20 @@
+BEFORE PAYMENTS / AI WILL WORK: set your backend URL in TWO places.
+===================================================================
+After you deploy the backend (inkwell-supabase.zip → Cloudflare Worker), you'll
+have a URL like:  https://inkwell-backend.YOURNAME.workers.dev
+
+1) LANDING PAGE  →  public/index.html
+   Find:   const API_BASE = "";
+   Set to: const API_BASE = "https://inkwell-backend.YOURNAME.workers.dev";
+
+2) THE APP  →  public/app/index.html  AND  public/app/inkwell-ai.html
+   Find:   const DEFAULT_API_BASE = "";
+   Set to: const DEFAULT_API_BASE = "https://inkwell-backend.YOURNAME.workers.dev";
+
+Then redeploy to Vercel. That's it.
+
+(Until you set these, the course/practice/lessons still work fully — only the
+"Pay with Flutterwave" button and the in-app AI features need the URL.)
+
+Also: in your backend src/index.js set ALLOWED_ORIGINS to your Vercel domain
+before going public (replace ["*"]).

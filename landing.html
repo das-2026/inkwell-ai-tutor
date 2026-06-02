@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1f4636" />
+<title>Inkwell — Learn to Write Well</title>
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./apple-touch-icon-180.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4ecdc; --paper-2:#efe5d0; --ink:#2a241d; --ink-soft:#5b5141;
+    --green:#1f4636; --green-2:#2c604a; --green-soft:#e3ece4; --gold:#c89b3c;
+    --gold-deep:#a87f25; --coral:#c75b39; --line:#d8cbb0; --shadow:rgba(31,70,54,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Spectral",serif; color:var(--ink); background:var(--paper);
+    -webkit-font-smoothing:antialiased; line-height:1.55;
+    background-image:radial-gradient(circle at 1px 1px, rgba(120,90,40,.05) 1px, transparent 0);
+    background-size:22px 22px;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  h1,h2,h3{font-family:"Fraunces",serif;letter-spacing:-.01em;color:var(--green);line-height:1.1}
+  a{color:var(--green-2)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:24px;
+    font-family:"Spectral",serif;font-weight:600;font-size:1rem;padding:13px 26px;cursor:pointer;text-decoration:none}
+  .btn-primary{background:var(--green);color:var(--paper);box-shadow:0 6px 16px var(--shadow)}
+  .btn-gold{background:var(--gold);color:#2a241d}
+  .btn-outline{background:transparent;border:1.5px solid var(--green);color:var(--green)}
+  .btn:active{transform:translateY(1px)}
+
+  /* header */
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(var(--paper) 76%, rgba(244,236,220,0));backdrop-filter:saturate(1.1)}
+  .nav{display:flex;align-items:center;gap:14px;padding:16px 20px;max-width:1040px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:10px;margin-right:auto}
+  .logo .mark{width:38px;height:38px;border-radius:11px;background:var(--green);display:grid;place-items:center;color:var(--gold);box-shadow:0 4px 10px var(--shadow)}
+  .logo b{font-family:"Fraunces",serif;font-weight:800;font-size:1.3rem;color:var(--green)}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center;padding:42px 0 30px}
+  .hero h1{font-size:2.6rem;margin:0 0 14px}
+  .hero p.lead{font-size:1.15rem;color:var(--ink-soft);margin:0 0 22px}
+  .hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .badge{display:inline-block;background:var(--green-soft);color:var(--green);font-weight:600;font-size:.8rem;
+    padding:6px 13px;border-radius:20px;margin-bottom:16px}
+  .heroart{background:linear-gradient(150deg,var(--green),#163528);border-radius:24px;padding:30px;color:var(--paper);box-shadow:0 12px 30px var(--shadow)}
+  .heroart h3{color:#fff;margin:0 0 12px;font-size:1.2rem}
+  .heroart ul{margin:0;padding-left:18px}
+  .heroart li{margin:7px 0;color:rgba(255,255,255,.9)}
+
+  /* sections */
+  section{padding:34px 0}
+  .eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);font-weight:600}
+  h2.title{font-size:1.9rem;margin:6px 0 22px}
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .feat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+  .feat .ic{font-size:1.6rem}
+  .feat h3{font-size:1.05rem;margin:8px 0 6px}
+  .feat p{margin:0;color:var(--ink-soft);font-size:.94rem}
+
+  /* pricing */
+  .packs{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .pack{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:16px;text-align:center;cursor:pointer;transition:border-color .15s, transform .1s}
+  .pack:hover{border-color:var(--gold)}
+  .pack:active{transform:scale(.98)}
+  .pack .amt{font-family:"Fraunces",serif;font-weight:800;font-size:1.25rem;color:var(--green)}
+  .pack .cr{font-size:.82rem;color:var(--ink-soft);margin-top:3px}
+  .pack.sel{border-color:var(--green);box-shadow:0 0 0 2px var(--green-soft)}
+  .rate{font-size:.9rem;color:var(--ink-soft);margin:0 0 16px}
+
+  .buybox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:18px;max-width:460px}
+  .buybox label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin:0 0 5px}
+  .buybox input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:"Spectral",serif;font-size:1rem;background:var(--paper);color:var(--ink)}
+  .buybox .row{margin-bottom:14px}
+  .note{font-size:.85rem;color:var(--ink-soft);margin-top:12px}
+  .msg{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:.92rem;display:none}
+  .msg.ok{background:var(--green-soft);color:var(--green);display:block}
+  .msg.err{background:#f6e2dc;color:#a23b22;display:block}
+  .msg.info{background:#eef3ee;color:var(--ink);display:block}
+  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .8s linear infinite;vertical-align:-3px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  footer{padding:34px 0 50px;color:var(--ink-soft);font-size:.9rem;border-top:1px solid var(--line);margin-top:20px}
+
+  @media(max-width:780px){
+    .hero{grid-template-columns:1fr;gap:22px;padding:26px 0}
+    .hero h1{font-size:2rem}
+    .features{grid-template-columns:1fr}
+    .packs{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="logo"><div class="mark">✒</div><b>Inkwell</b></div>
+    <a href="#pricing" class="btn btn-outline">Buy credits</a>
+    <a href="./index.html" class="btn btn-primary">Open the app</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <span class="badge">For Ghanaian students · JHS & SHS</span>
+      <h1>Learn to write with confidence.</h1>
+      <p class="lead">Inkwell teaches writing step by step — from a single sentence to full essays, articles, speeches and letters — with guided lessons you can read or listen to, practice after every slide, model answers, and a live AI tutor.</p>
+      <div class="ctas">
+        <a href="./index.html" class="btn btn-primary">Start learning free →</a>
+        <a href="#pricing" class="btn btn-gold">Buy credits</a>
+      </div>
+      <p class="note">25 modules · 230 lessons · works offline · the whole course is free. Credits are only for the AI tutor, AI marking and AI voice.</p>
+    </div>
+    <div class="heroart">
+      <h3>What you get</h3>
+      <ul>
+        <li>Sentences, paragraphs, essays & composition</li>
+        <li>Practice after every lesson, with model answers</li>
+        <li>10 comprehension & 10 summary passages</li>
+        <li>AI tutor, AI marking & natural AI voice</li>
+        <li>Listen to any lesson — great for revision</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="eyebrow">Why Inkwell</div>
+    <h2 class="title">Everything a young writer needs</h2>
+    <div class="features">
+      <div class="feat"><div class="ic">📚</div><h3>A full course</h3><p>25 modules covering sentences, all paragraph types, essays, letters, articles, speeches, debates, reports and more.</p></div>
+      <div class="feat"><div class="ic">✍️</div><h3>Practice that sticks</h3><p>After each slide: re-type the concept, copy a model, write your own, and answer a question — with self-check rubrics.</p></div>
+      <div class="feat"><div class="ic">✦</div><h3>AI tutor & marking</h3><p>Ask anything, and get your essays and answers marked instantly with kind, specific feedback.</p></div>
+      <div class="feat"><div class="ic">🔊</div><h3>Listen & learn</h3><p>Every lesson can be read aloud — perfect for revision on the go, and for building your ear for good writing.</p></div>
+      <div class="feat"><div class="ic">📶</div><h3>Works offline</h3><p>Install it once and the whole course works with no internet — only the AI features need a connection.</p></div>
+      <div class="feat"><div class="ic">🇬🇭</div><h3>Made for Ghana</h3><p>Examples, names and contexts students recognise, matched to the JHS & SHS writing syllabus.</p></div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="eyebrow">Credits</div>
+    <h2 class="title">Top up to unlock AI features</h2>
+    <p class="rate">Rate: <b>GHS 60 = 10,000 credits</b> · AI tutor reply ~50 · AI marking ~80 · AI voice ~20. The course itself is free.</p>
+    <div class="packs" id="packs"></div>
+
+    <div class="buybox">
+      <div class="row">
+        <label for="phone">Your phone number (your Inkwell account)</label>
+        <input id="phone" inputmode="tel" placeholder="0XX XXX XXXX" />
+      </div>
+      <div class="row">
+        <label for="amount">Amount (GHS)</label>
+        <input id="amount" inputmode="numeric" placeholder="Select a pack above, or type an amount" />
+      </div>
+      <button class="btn btn-primary" id="payBtn" style="width:100%">Pay with Flutterwave</button>
+      <div class="msg" id="msg"></div>
+      <p class="note">You'll be taken to Flutterwave to pay securely with Mobile Money or card. Credits are added to the account for the phone number above. New here? Just sign up with the same phone inside the app.</p>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <b style="color:var(--green);font-family:'Fraunces',serif">Inkwell</b> — learn to write well.<br>
+    <a href="./index.html">Open the app</a> · Payments secured by Flutterwave.
+  </footer>
+</div>
+
+<script>
+  // ===== CONFIG: set this to your deployed backend Worker URL =====
+  // e.g. "https://inkwell-backend.yourname.workers.dev"
+  const API_BASE = "";
+
+  const PACKS = [60,120,180,240,300,360,420,480,540,600];
+  const RATE = 10000/60;
+  const packsEl = document.getElementById("packs");
+  const amountEl = document.getElementById("amount");
+  const phoneEl = document.getElementById("phone");
+  const msg = document.getElementById("msg");
+  let selected = null;
+
+  PACKS.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="pack"; b.dataset.amt=c;
+    b.innerHTML='<div class="amt">GHS '+c+'</div><div class="cr">'+Math.round(c*RATE).toLocaleString()+' credits</div>';
+    b.onclick=()=>{ selected=c; amountEl.value=c;
+      document.querySelectorAll('.pack').forEach(p=>p.classList.toggle('sel', p===b)); };
+    packsEl.appendChild(b);
+  });
+  amountEl.addEventListener('input', ()=>{ document.querySelectorAll('.pack').forEach(p=>p.classList.remove('sel')); selected=null; });
+
+  function show(kind, text){ msg.className="msg "+kind; msg.innerHTML=text; }
+
+  document.getElementById("payBtn").onclick = async ()=>{
+    const phone = (phoneEl.value||"").replace(/[^\d+]/g,"");
+    const amount = parseInt(amountEl.value,10);
+    if(!phone || phone.length<7){ show("err","Please enter your phone number."); return; }
+    if(!amount || amount<1){ show("err","Choose a credit pack or enter an amount."); return; }
+    if(!API_BASE){ show("err","Payments aren't configured yet. Set API_BASE in this page to your backend URL."); return; }
+
+    const btn=document.getElementById("payBtn");
+    btn.disabled=true; const old=btn.textContent; btn.innerHTML='<span class="spinner"></span> Starting secure payment…';
+    try{
+      // The backend creates a Flutterwave payment for this phone+amount and
+      // returns a checkout link. The backend later verifies the payment
+      // (webhook) and credits the account — the secret key never touches this page.
+      const res = await fetch(API_BASE.replace(/\/+$/,'')+"/pay/initiate-public", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ phone, amount, redirect_url: location.href })
+      });
+      const data = await res.json();
+      if(!res.ok || !data.link){ show("err", (data.error||"Couldn't start payment.")); btn.disabled=false; btn.textContent=old; return; }
+      show("info","Redirecting you to Flutterwave…");
+      window.location.href = data.link;   // go pay; Flutterwave returns here after
+    }catch(e){
+      show("err","Couldn't reach the payment server. Check your connection and try again.");
+      btn.disabled=false; btn.textContent=old;
+    }
+  };
+
+  // On return from Flutterwave, confirm and tell the user.
+  (function handleReturn(){
+    const q = new URLSearchParams(location.search);
+    const status = q.get("status");
+    const txref = q.get("tx_ref");
+    if(!status && !txref) return;
+    if(status==="successful" || status==="completed"){
+      show("ok","✅ Payment received! Your credits have been added. Open the app and log in with your phone number to use them.");
+    } else if(status==="cancelled"){
+      show("err","Payment was cancelled. You can try again any time.");
+    } else if(txref){
+      show("info","Thanks! If your payment went through, your credits will appear shortly. Open the app to check your balance.");
+    }
+    // clean the URL
+    history.replaceState({}, "", location.pathname + "#pricing");
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1914 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#1f4636" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Inkwell" />
+<title>Inkwell · Learn to Write Well</title>
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./apple-touch-icon-180.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   INKWELL — a writing-skills learning companion
+   Single-file, offline-first, mobile web app (PWA-ready).
+   Audio teaching uses the device's built-in speech engine
+   (Web Speech API) so it needs no audio files and works offline.
+   ============================================================ */
+
+:root{
+  --paper:#f4ecdc;
+  --paper-2:#efe5d0;
+  --ink:#2a241d;
+  --ink-soft:#5b5141;
+  --green:#1f4636;
+  --green-2:#2c604a;
+  --green-soft:#e3ece4;
+  --gold:#c89b3c;
+  --gold-deep:#a87f25;
+  --coral:#c75b39;
+  --line:#d8cbb0;
+  --shadow:rgba(42,36,29,.16);
+  --ok:#2c734f;
+  --maxw:520px;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:"Spectral",Georgia,serif;
+  color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(200,155,60,.07), transparent 40%),
+    radial-gradient(circle at 82% 88%, rgba(31,70,54,.07), transparent 42%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+  overscroll-behavior-y:none;
+}
+
+/* App shell */
+#app{
+  max-width:var(--maxw);
+  margin:0 auto;
+  min-height:100%;
+  position:relative;
+  padding:0 0 96px;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Top kente-inspired hairline */
+.banner{
+  height:6px;
+  background:repeating-linear-gradient(90deg,
+    var(--green) 0 14px, var(--gold) 14px 20px, var(--coral) 20px 26px, var(--green-2) 26px 40px);
+  opacity:.9;
+}
+
+header.topbar{
+  position:sticky;top:0;z-index:30;
+  background:linear-gradient(var(--paper) 70%, rgba(244,236,220,0));
+  padding:14px 20px 10px;
+  display:flex;align-items:center;gap:12px;
+}
+header.topbar .brand{
+  font-family:"Fraunces",serif;font-weight:800;font-size:1.35rem;letter-spacing:-.02em;
+  color:var(--green);line-height:1;margin-right:auto;
+}
+header.topbar .creditpill{
+  flex:0 0 auto;background:var(--green);color:var(--gold);border:none;
+  font-family:"Spectral",serif;font-size:.92rem;padding:7px 13px;border-radius:20px;cursor:pointer;
+  box-shadow:0 3px 8px var(--shadow);
+}
+header.topbar .creditpill b{color:#fff;font-weight:700}
+header.topbar .brand small{
+  display:block;font-family:"Spectral",serif;font-weight:400;font-size:.66rem;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:3px;
+}
+header.topbar .pen{
+  width:34px;height:34px;border-radius:10px;flex:0 0 auto;
+  background:var(--green);display:grid;place-items:center;color:var(--gold);
+  box-shadow:0 4px 10px var(--shadow);
+}
+.streak{margin-left:auto;font-size:.78rem;color:var(--ink-soft);text-align:right}
+.streak b{color:var(--coral);font-family:"Fraunces",serif}
+
+main{flex:1;padding:6px 20px 20px;animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Headings */
+h1.view-title{font-family:"Fraunces",serif;font-weight:800;font-size:1.7rem;letter-spacing:-.02em;margin:.2em 0 .15em;color:var(--ink)}
+.view-sub{color:var(--ink-soft);font-size:.95rem;margin:0 0 18px}
+
+/* Hero (home) */
+.hero{
+  background:linear-gradient(150deg,var(--green) 0%, #163528 100%);
+  color:var(--paper);border-radius:22px;padding:22px 22px 20px;position:relative;overflow:hidden;
+  box-shadow:0 14px 30px -12px rgba(31,70,54,.7);margin-bottom:22px;
+}
+.hero:after{content:"";position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,var(--gold) 0%,transparent 70%);opacity:.35}
+.hero h2{font-family:"Fraunces",serif;font-weight:800;font-size:1.5rem;margin:0 0 6px;line-height:1.15}
+.hero p{margin:0;opacity:.9;font-size:.95rem}
+.hero .cta{margin-top:16px}
+
+/* Buttons */
+.btn{
+  font-family:"Spectral",serif;font-weight:600;font-size:1rem;border:none;cursor:pointer;
+  padding:13px 20px;border-radius:13px;display:inline-flex;align-items:center;gap:9px;
+  transition:transform .12s ease, box-shadow .2s ease, background .2s;text-decoration:none;
+}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn-primary{background:var(--gold);color:#27210f;box-shadow:0 8px 18px -8px var(--gold-deep)}
+.btn-primary:hover{background:#d8aa46}
+.btn-ghost{background:rgba(255,255,255,.14);color:var(--paper);border:1px solid rgba(255,255,255,.28)}
+.btn-outline{background:transparent;color:var(--green);border:1.5px solid var(--green)}
+.btn-block{width:100%;justify-content:center}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+
+/* Module cards */
+.modules{display:flex;flex-direction:column;gap:14px}
+.packs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pack{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:left}
+.pack:active{transform:scale(.98)}
+.pack .amt{font-family:"Fraunces",serif;font-weight:800;font-size:1.05rem;color:var(--green)}
+.pack .cr{font-size:.8rem;color:var(--ink-soft);margin-top:2px}
+.jumpbar{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch}
+.jumpbar .jump{flex:0 0 auto;background:var(--green-soft);color:var(--green);border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-family:"Spectral",serif;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.jumpbar .jump:active{transform:scale(.97)}
+.sec{margin-bottom:22px;scroll-margin-top:70px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin:4px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+.sec-head h2{font-family:"Fraunces",serif;font-weight:800;font-size:1.15rem;margin:0;color:var(--ink)}
+.sec-head span{font-size:.78rem;color:var(--ink-soft)}
+.sec-count{font-family:"Fraunces",serif;font-weight:700;font-size:.9rem;color:var(--green);background:var(--green-soft);padding:3px 11px;border-radius:20px;flex:0 0 auto}
+.mod{
+  background:var(--paper-2);border:1px solid var(--line);border-radius:18px;padding:16px 16px 16px 16px;
+  display:flex;gap:14px;align-items:flex-start;cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .14s ease, box-shadow .2s;
+}
+.mod:hover{transform:translateY(-2px);box-shadow:0 12px 24px -14px var(--shadow)}
+.mod .num{
+  flex:0 0 auto;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+  font-family:"Fraunces",serif;font-weight:800;font-size:1.25rem;color:var(--paper);
+}
+.mod .meta{flex:1;min-width:0}
+.mod h3{font-family:"Fraunces",serif;font-weight:600;font-size:1.12rem;margin:0 0 2px;color:var(--ink)}
+.mod p{margin:0;font-size:.85rem;color:var(--ink-soft)}
+.mod .tagrow{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.tag{font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;background:var(--green-soft);
+  color:var(--green);padding:3px 9px;border-radius:20px;font-weight:600}
+.tag.warn{background:#f7e6df;color:var(--coral)}
+.mbar{height:5px;border-radius:5px;background:var(--line);margin-top:11px;overflow:hidden}
+.mbar i{display:block;height:100%;background:var(--gold);width:0;transition:width .5s ease}
+.mod .check{position:absolute;top:12px;right:12px;color:var(--ok);font-size:1.1rem;display:none}
+.mod.done .check{display:block}
+
+/* ---- Lesson / slide deck ---- */
+.deck-head{display:flex;align-items:center;gap:10px;margin:2px 0 14px}
+.deck-head .back{background:none;border:none;color:var(--green);font-size:1rem;font-weight:600;cursor:pointer;padding:6px;display:flex;align-items:center;gap:4px}
+.deck-head .titlewrap{flex:1;min-width:0}
+.deck-head .kicker{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);font-weight:600}
+.deck-head h2{font-family:"Fraunces",serif;font-size:1.18rem;margin:0;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.progress-dots{display:flex;gap:6px;margin:0 0 14px;flex-wrap:wrap}
+.progress-dots i{height:6px;flex:1;min-width:10px;border-radius:6px;background:var(--line);transition:background .3s}
+.progress-dots i.on{background:var(--green)}
+.progress-dots i.cur{background:var(--gold)}
+
+.slide{
+  background:var(--paper-2);border:1px solid var(--line);border-radius:20px;
+  padding:22px;min-height:300px;box-shadow:0 10px 26px -18px var(--shadow);
+  animation:slidein .32s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes slidein{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.slide .badge{display:inline-flex;align-items:center;gap:7px;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--coral);font-weight:600;margin-bottom:10px}
+.slide h3{font-family:"Fraunces",serif;font-weight:800;font-size:1.45rem;line-height:1.2;margin:0 0 12px;color:var(--ink)}
+.slide .body{font-size:1.02rem;color:var(--ink)}
+.slide .body p{margin:0 0 12px}
+.slide .body ul{margin:0 0 12px;padding-left:1.15em}
+.slide .body li{margin:0 0 7px}
+.slide .body b{color:var(--green-2)}
+.callout{background:var(--green-soft);border-left:4px solid var(--green);border-radius:0 12px 12px 0;
+  padding:12px 14px;margin:14px 0;font-size:.95rem}
+.callout.gold{background:#f7eecf;border-left-color:var(--gold)}
+.callout.warn{background:#f7e6df;border-left-color:var(--coral)}
+.callout .lab{display:block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:3px;color:var(--ink-soft)}
+.example{font-family:"Spectral",serif;font-style:italic;background:#fffdf6;border:1px dashed var(--line);
+  padding:11px 13px;border-radius:10px;margin:8px 0;font-size:.98rem}
+.example.bad{color:var(--coral);border-color:#e7b6a6}
+.example.good{color:var(--ok);border-color:#aacbb5}
+.example .pfx{font-style:normal;font-weight:600;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:2px;opacity:.8}
+
+/* audio bar */
+.audiobar{display:flex;align-items:center;gap:12px;margin:16px 0 4px;background:var(--green);
+  color:var(--paper);border-radius:14px;padding:10px 12px}
+.audiobar button{background:var(--gold);border:none;width:42px;height:42px;border-radius:50%;
+  display:grid;place-items:center;cursor:pointer;color:#27210f;flex:0 0 auto;transition:transform .12s}
+.audiobar button:active{transform:scale(.93)}
+.audiobar .wave{flex:1;height:24px;display:flex;align-items:center;gap:3px;overflow:hidden}
+.audiobar .wave span{flex:1;background:rgba(255,255,255,.45);border-radius:3px;height:30%}
+.audiobar.playing .wave span{animation:eq 1s ease-in-out infinite}
+.audiobar .wave span:nth-child(2n){animation-delay:.15s}
+.audiobar .wave span:nth-child(3n){animation-delay:.3s}
+.audiobar .wave span:nth-child(4n){animation-delay:.45s}
+@keyframes eq{0%,100%{height:25%}50%{height:90%}}
+.audiobar .lab{font-size:.74rem;opacity:.85;flex:0 0 auto}
+.autotgl{background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.32)!important;color:var(--paper)!important;width:auto!important;height:auto!important;border-radius:20px!important;padding:6px 11px!important;font-family:"Spectral",serif;font-size:.7rem;font-weight:600;flex:0 0 auto;cursor:pointer}
+.progress-dots i.prac{background:#e7c4b5}
+.progress-dots i.prac.on{background:var(--coral)}
+
+/* deck nav */
+.deck-nav{display:flex;gap:12px;margin-top:16px}
+.deck-nav .btn{flex:1}
+
+/* ---- Practice ---- */
+.ptype{display:flex;flex-direction:column;gap:13px}
+.ptype-card{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;
+  display:flex;gap:13px;align-items:center;transition:transform .14s, box-shadow .2s}
+.ptype-card:hover{transform:translateY(-2px);box-shadow:0 12px 24px -16px var(--shadow)}
+.ptype-card .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--paper);flex:0 0 auto;font-size:1.2rem}
+.ptype-card h3{font-family:"Fraunces",serif;font-size:1.05rem;margin:0 0 2px}
+.ptype-card p{margin:0;font-size:.82rem;color:var(--ink-soft)}
+
+.task{background:var(--paper-2);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 26px -18px var(--shadow)}
+.task .qlab{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);font-weight:600}
+.task .prompt{font-size:1.06rem;margin:6px 0 4px;color:var(--ink)}
+.task .given{background:#fffdf6;border:1px dashed var(--line);border-radius:11px;padding:12px 14px;margin:12px 0;font-size:.98rem}
+.task .given ul{margin:0;padding-left:1.1em}
+.task .given li{margin:0 0 5px}
+textarea.write{width:100%;min-height:150px;resize:vertical;border:1.5px solid var(--line);border-radius:12px;
+  padding:13px;font-family:"Spectral",serif;font-size:1rem;color:var(--ink);background:#fffdf6;line-height:1.6}
+textarea.write:focus{outline:none;border-color:var(--green)}
+.wordcount{font-size:.74rem;color:var(--ink-soft);text-align:right;margin:5px 2px 0}
+
+.reveal{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px;animation:fade .3s both}
+.reveal h4{font-family:"Fraunces",serif;font-size:1rem;margin:0 0 7px;color:var(--green)}
+.listen-mini{font-family:"Spectral",serif;font-size:.78rem;font-weight:600;background:var(--green-soft);color:var(--green);border:1px solid var(--line);border-radius:16px;padding:3px 10px;margin-left:8px;cursor:pointer;vertical-align:middle}
+.listen-mini:active{transform:scale(.97)}
+.model{background:var(--green-soft);border-radius:12px;padding:14px 16px;font-size:.97rem;line-height:1.5;margin-bottom:12px}
+.model b{color:var(--green)}
+.rubric{list-style:none;padding:0;margin:6px 0 0}
+.rubric li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.rubric li:last-child{border-bottom:none}
+.rubric input{width:22px;height:22px;flex:0 0 auto;accent-color:var(--green);margin-top:1px}
+.scorebox{margin-top:12px;background:var(--gold);color:#27210f;border-radius:12px;padding:12px 14px;font-weight:600;display:none}
+.scorebox.show{display:block}
+
+/* ---- Progress ---- */
+.ring-wrap{display:flex;align-items:center;gap:18px;background:var(--paper-2);border:1px solid var(--line);
+  border-radius:20px;padding:18px;margin-bottom:18px}
+.ring{width:96px;height:96px;flex:0 0 auto}
+.ring-wrap .info h3{font-family:"Fraunces",serif;font-size:1.3rem;margin:0 0 2px}
+.ring-wrap .info p{margin:0;font-size:.86rem;color:var(--ink-soft)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.stat{background:var(--paper-2);border:1px solid var(--line);border-radius:15px;padding:14px}
+.stat b{font-family:"Fraunces",serif;font-size:1.5rem;color:var(--green);display:block}
+.stat span{font-size:.78rem;color:var(--ink-soft)}
+.tip{background:#f7eecf;border-radius:14px;padding:14px 16px;font-size:.92rem;border-left:4px solid var(--gold)}
+
+/* Bottom nav */
+nav.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  max-width:var(--maxw);margin:0 auto;
+  background:rgba(244,236,220,.94);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+}
+nav.tabbar button{
+  background:none;border:none;cursor:pointer;color:var(--ink-soft);font-family:"Spectral",serif;
+  font-size:.68rem;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 14px;border-radius:10px;
+  transition:color .2s;flex:1;
+}
+nav.tabbar button svg{width:23px;height:23px}
+nav.tabbar button.active{color:var(--green)}
+nav.tabbar button.active svg{transform:translateY(-1px)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);z-index:60;
+  background:var(--green);color:var(--paper);padding:12px 20px;border-radius:30px;font-size:.9rem;
+  box-shadow:0 10px 30px -8px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.3s;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---- AI Studio ---- */
+.ai-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#6b3fa0,#9a5bd0);color:#fff;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:4px 10px;border-radius:20px;vertical-align:middle}
+.ai-card{background:var(--paper-2);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 10px 26px -18px var(--shadow)}
+.ai-card h3{font-family:"Fraunces",serif;font-size:1.12rem;margin:0 0 4px;color:var(--ink)}
+.ai-card p.desc{margin:0 0 13px;font-size:.86rem;color:var(--ink-soft)}
+.field{margin-bottom:11px}
+.switch{display:flex;align-items:center;gap:9px;font-family:"Spectral",serif;font-size:.95rem;color:var(--ink);cursor:pointer}
+.switch input{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
+.field label{display:block;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:5px}
+.field input,.field select{width:100%;padding:12px;border-radius:11px;border:1.5px solid var(--line);background:#fffdf6;font-family:"Spectral",serif;font-size:1rem;color:var(--ink)}
+.field input:focus,.field select:focus{outline:none;border-color:#6b3fa0}
+.aiprimary{background:linear-gradient(135deg,#6b3fa0,#8a4fc0);color:#fff;box-shadow:0 8px 18px -8px #6b3fa0}
+.aiprimary:hover{filter:brightness(1.07)}
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-note{background:#efe7f6;border-left:4px solid #6b3fa0;border-radius:0 12px 12px 0;padding:11px 14px;font-size:.84rem;margin-top:10px;color:#3d2a52}
+.lesson-chip{display:flex;align-items:center;gap:11px;background:#fffdf6;border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-top:9px;cursor:pointer;transition:transform .12s}
+.lesson-chip:hover{transform:translateY(-1px)}
+.lesson-chip .dot{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6b3fa0,#9a5bd0);display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.lesson-chip b{font-family:"Fraunces",serif;font-weight:600;font-size:.96rem;color:var(--ink)}
+.lesson-chip span{display:block;font-size:.76rem;color:var(--ink-soft)}
+.chat{display:flex;flex-direction:column;gap:9px;max-height:48vh;overflow-y:auto;padding:4px 2px 6px}
+.msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:.94rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+.msg.me{align-self:flex-end;background:var(--green);color:var(--paper);border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:#efe7f6;color:#2f2440;border-bottom-left-radius:4px}
+.msg.ai.thinking{color:#6b3fa0;font-style:italic}
+.chatbar{display:flex;gap:8px;margin-top:11px}
+.chatbar input{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:#fffdf6;font-family:"Spectral",serif;font-size:1rem;color:var(--ink)}
+.chatbar input:focus{outline:none;border-color:#6b3fa0}
+.chatbar button{flex:0 0 auto;border:none;border-radius:12px;padding:0 17px;background:#6b3fa0;color:#fff;cursor:pointer;font-size:1.05rem}
+.fb{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px;animation:fade .3s both}
+.fb .scorebadge{display:inline-block;background:linear-gradient(135deg,#6b3fa0,#9a5bd0);color:#fff;font-family:"Fraunces",serif;font-weight:800;font-size:1.05rem;padding:6px 16px;border-radius:30px;margin-bottom:8px}
+.fb h4{font-family:"Fraunces",serif;font-size:.96rem;margin:12px 0 5px;color:var(--ink)}
+.fb ul{margin:0;padding-left:1.15em}
+.fb li{margin:0 0 5px;font-size:.92rem}
+.fb .corrected{background:var(--green-soft);border-radius:12px;padding:12px 14px;font-size:.95rem;margin-top:4px;font-style:italic}
+.fb .enc{margin-top:11px;font-weight:600;color:#6b3fa0}
+.hidden{display:none !important}
+.spacer{height:6px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="banner"></div>
+  <header class="topbar">
+    <div class="pen">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+    </div>
+    <div class="brand">Inkwell<small>Write with confidence</small></div>
+    <button class="creditpill" id="creditPill" title="Your credits">✦ <b id="creditNum">—</b></button>
+  </header>
+
+  <main id="view"></main>
+
+  <nav class="tabbar" id="tabbar">
+    <button data-tab="home" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+      Home
+    </button>
+    <button data-tab="learn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h7v16H6a2 2 0 0 0-2 2V5z"/><path d="M20 5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2V5z"/></svg>
+      Learn
+    </button>
+    <button data-tab="practice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+      Practice
+    </button>
+    <button data-tab="studio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
+      Studio
+    </button>
+    <button data-tab="progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>
+      Progress
+    </button>
+    <button data-tab="account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+      Account
+    </button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DATA: CURRICULUM ================= */
+/* Each module has teaching slides (with narration text) and practice tasks. */
+
+/* Module content now lives in modules.json (loaded & cached at startup for
+   faster first paint on low-end phones). MODULES is filled by loadModules(). */
+let MODULES = [];
+
+const MKEY = "inkwell_modules_v1";
+async function loadModules(){
+  // If lessons are embedded in the page (standalone/bundled build), use them
+  // first — this is what makes opening the file directly (file://) work.
+  try{
+    if(window.INKWELL_MODULES && Array.isArray(window.INKWELL_MODULES) && window.INKWELL_MODULES.length){
+      MODULES = window.INKWELL_MODULES;
+      try{ localStorage.setItem(MKEY, JSON.stringify(MODULES)); }catch(e){}
+      return MODULES;
+    }
+  }catch(e){}
+  // Resolve modules.json relative to THIS document, so it works no matter
+  // what path the host serves the app from (root, subfolder, rewrite, etc.).
+  const candidates = [];
+  try{ candidates.push(new URL("modules.json", document.baseURI).href); }catch(e){}
+  try{ candidates.push(new URL("./modules.json", location.href).href); }catch(e){}
+  candidates.push("modules.json");
+  candidates.push("/modules.json");
+  // de-dupe
+  const tried = [...new Set(candidates)];
+  let lastErr = "";
+  // 1) Try the network (fresh content), then cache it.
+  for(const u of tried){
+    try{
+      const res = await fetch(u, {cache:"no-cache"});
+      if(res.ok){
+        const data = await res.json();
+        if(Array.isArray(data) && data.length){
+          MODULES = data;
+          try{ localStorage.setItem(MKEY, JSON.stringify(data)); }catch(e){}
+          return MODULES;
+        } else { lastErr = "modules.json loaded but was empty/invalid."; }
+      } else { lastErr = "modules.json responded "+res.status+" at "+u; }
+    }catch(e){ lastErr = "Could not reach "+u+" ("+e.message+")"; }
+  }
+  window._modLoadErr = lastErr;
+  // 2) Fall back to the cached copy (works offline after first successful load).
+  try{
+    const cached = localStorage.getItem(MKEY);
+    if(cached){ const d=JSON.parse(cached); if(Array.isArray(d)&&d.length){ MODULES=d; return MODULES; } }
+  }catch(e){}
+  // 3) Embedded fallback (set by an inline <script> in the packaged app).
+  try{
+    if(window.INKWELL_MODULES && Array.isArray(window.INKWELL_MODULES) && window.INKWELL_MODULES.length){
+      MODULES = window.INKWELL_MODULES; return MODULES;
+    }
+  }catch(e){}
+  // 4) Nothing available.
+  MODULES = [];
+  return MODULES;
+}
+
+/* ================= STATE (in-memory) ================= */
+const state = {
+  tab:"home",
+  modIndex:0,
+  slideIndex:0,
+  practiceType:null,
+  practiceTaskIndex:0,
+  progress: [],
+  practiceDone:0,
+  streak:1,
+  deckSource:"module",
+  _inPassages:false,
+  passageIndex:0,
+  aiLessons:[],
+  aiLessonIndex:0,
+  _inAIDeck:false,
+  chat:[],
+  autoPlay:true,
+  proxyUrl:"",
+  apiBase:"",
+  token:"",
+  account:null,          // {phone, credits, unlocked:[]}
+  aiVoice:false,
+  ttsVoice:"alloy",
+  lastVisit:null,
+  pracCache:{}
+};
+
+/* ================= PERSISTENCE (localStorage) ================= */
+/* Wrapped in try/catch so the app still works (in memory) if storage
+   is unavailable — e.g. inside a sandboxed preview. On a real device
+   this persists progress, generated lessons, chat and settings. */
+const Store = {
+  ok: (()=>{ try{ const k="__ink_test"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true; }catch(e){ return false; } })(),
+  get(key, fallback){ if(!this.ok) return fallback; try{ const v=localStorage.getItem(key); return v==null?fallback:JSON.parse(v); }catch(e){ return fallback; } },
+  set(key, val){ if(!this.ok) return; try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} },
+  remove(key){ if(!this.ok) return; try{ localStorage.removeItem(key); }catch(e){} }
+};
+const SKEY = "inkwell_save_v1";
+function persist(){
+  Store.set(SKEY, {
+    progress: state.progress.map(p=>({slidesSeen:[...p.slidesSeen], done:p.done})),
+    aiLessons: state.aiLessons,
+    chat: state.chat,
+    practiceDone: state.practiceDone,
+    streak: state.streak,
+    autoPlay: state.autoPlay,
+    proxyUrl: state.proxyUrl,
+    apiBase: state.apiBase,
+    token: state.token,
+    account: state.account,
+    aiVoice: state.aiVoice,
+    ttsVoice: state.ttsVoice,
+    lastVisit: state.lastVisit,
+    pracCache: state.pracCache
+  });
+}
+function daysBetween(a,b){ const da=new Date(a+"T00:00:00"), db=new Date(b+"T00:00:00"); return Math.round((db-da)/86400000); }
+function initProgress(){
+  state.progress = MODULES.map(()=>({slidesSeen:new Set(), done:false}));
+}
+function loadState(){
+  initProgress();
+  const d = Store.get(SKEY, null);
+  if(d){
+    if(Array.isArray(d.progress)) d.progress.forEach((p,i)=>{
+      if(state.progress[i]){ state.progress[i].slidesSeen=new Set(p.slidesSeen||[]); state.progress[i].done=!!p.done; }
+    });
+    if(Array.isArray(d.aiLessons)) state.aiLessons=d.aiLessons;
+    if(Array.isArray(d.chat)) state.chat=d.chat;
+    if(typeof d.practiceDone==="number") state.practiceDone=d.practiceDone;
+    if(typeof d.autoPlay==="boolean") state.autoPlay=d.autoPlay;
+    if(typeof d.proxyUrl==="string") state.proxyUrl=d.proxyUrl;
+    if(typeof d.apiBase==="string") state.apiBase=d.apiBase;
+    if(typeof d.token==="string") state.token=d.token;
+    if(d.account && typeof d.account==="object") state.account=d.account;
+    if(typeof d.aiVoice==="boolean") state.aiVoice=d.aiVoice;
+    if(typeof d.ttsVoice==="string") state.ttsVoice=d.ttsVoice;
+    if(d.pracCache && typeof d.pracCache==="object") state.pracCache=d.pracCache;
+    state.streak = d.streak||1;
+    state.lastVisit = d.lastVisit||null;
+  }
+  // update daily streak
+  const today = new Date().toISOString().slice(0,10);
+  if(state.lastVisit){
+    const diff = daysBetween(state.lastVisit, today);
+    if(diff===1) state.streak=(state.streak||1)+1;
+    else if(diff>1) state.streak=1;
+  } else { state.streak=1; }
+  state.lastVisit = today;
+  persist();
+}
+function resetAll(){
+  Store.remove(SKEY);
+  initProgress();
+  state.aiLessons=[]; state.aiLessonIndex=0; state.chat=[]; state.practiceDone=0;
+  state.pracCache={};
+  state.streak=1; state.lastVisit=new Date().toISOString().slice(0,10);
+  persist();
+  const sn=document.getElementById("streakNum"); if(sn) sn.textContent=state.streak;
+}
+
+/* ================= SPEECH (audio teaching) ================= */
+/* ================= NARRATION (AI voice via OpenAI TTS, with device fallback) =================
+   Audio is fetched from the proxy's /tts route (key stays server-side), returned as MP3,
+   cached in memory per text+voice, and played through one shared <audio> element.
+   If no proxy is set or a request fails, we fall back to the device's speech synthesis. */
+const Speech = {
+  supported: true,               // always "supported" — AI audio, with device fallback
+  deviceTTS: ('speechSynthesis' in window),
+  speaking:false,
+  paused:false,
+  voice:null,                    // device voice (fallback)
+  audio:null,                    // shared HTMLAudioElement for AI audio
+  _cache:new Map(),              // key -> object URL (blob)
+  _token:0,                      // guards against out-of-order playback
+  pickVoice(){
+    if(!this.deviceTTS) return;
+    const vs = speechSynthesis.getVoices();
+    this.voice = vs.find(v=>/en[-_]GB/i.test(v.lang)) ||
+                 vs.find(v=>/en[-_]US/i.test(v.lang)) ||
+                 vs.find(v=>/^en/i.test(v.lang)) || vs[0] || null;
+  },
+  _aiEnabled(){ return !!(state.aiVoice && state.proxyUrl && state.proxyUrl.trim()); },
+  _key(text){ return (state.ttsVoice||'alloy') + '::' + text; },
+
+  async _fetchAudio(text){
+    const base = state.proxyUrl.trim().replace(/\/+$/,'');
+    const res = await fetch(base + "/tts", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ input:text, voice: state.ttsVoice||'alloy' })
+    });
+    if(!res.ok) throw new Error("TTS HTTP "+res.status);
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  },
+
+  async speak(text, onend){
+    this.stop();
+    const myToken = ++this._token;
+    if(this._aiEnabled()){
+      try{
+        const key = this._key(text);
+        let url = this._cache.get(key);
+        if(!url){ url = await this._fetchAudio(text); this._cache.set(key, url); }
+        if(myToken !== this._token) return;              // superseded while fetching
+        if(!this.audio){ this.audio = new Audio(); }
+        this.audio.src = url;
+        this.audio.onended = ()=>{ this.speaking=false; this.paused=false; if(onend) onend(); };
+        this.audio.onerror = ()=>{ this.speaking=false; this.paused=false; if(onend) onend(); };
+        this.speaking = true; this.paused = false;
+        await this.audio.play();
+        return;
+      }catch(e){
+        // fall through to device TTS
+        if(myToken !== this._token) return;
+      }
+    }
+    // ---- device fallback ----
+    if(!this.deviceTTS){ toast("Set up an AI voice in Studio to hear narration."); if(onend) onend(); return; }
+    const u = new SpeechSynthesisUtterance(text);
+    if(this.voice) u.voice = this.voice;
+    u.rate = 0.95; u.pitch = 1.0; u.volume = 1;
+    u.onend = ()=>{ this.speaking=false; this.paused=false; if(onend) onend(); };
+    this.speaking = true; this.paused=false;
+    speechSynthesis.speak(u);
+  },
+
+  toggle(text, onstate){
+    // AI audio currently playing/paused
+    if(this.audio && this.speaking){
+      if(!this.paused){ this.audio.pause(); this.paused=true; onstate&&onstate("paused"); return; }
+      else { this.audio.play(); this.paused=false; onstate&&onstate("playing"); return; }
+    }
+    // device TTS playing/paused
+    if(this.deviceTTS && this.speaking && !this.audio){
+      if(!this.paused){ speechSynthesis.pause(); this.paused=true; onstate&&onstate("paused"); return; }
+      else { speechSynthesis.resume(); this.paused=false; onstate&&onstate("playing"); return; }
+    }
+    // not playing -> start
+    this.speak(text, ()=>onstate&&onstate("ended")); onstate&&onstate("playing");
+  },
+
+  stop(){
+    this._token++;                                   // invalidate any in-flight fetch
+    if(this.audio){ try{ this.audio.pause(); this.audio.currentTime=0; }catch(e){} }
+    if(this.deviceTTS){ try{ speechSynthesis.cancel(); }catch(e){} }
+    this.speaking=false; this.paused=false;
+  }
+};
+if(Speech.deviceTTS){
+  Speech.pickVoice();
+  speechSynthesis.onvoiceschanged = ()=>Speech.pickVoice();
+}
+
+/* ================= HELPERS ================= */
+const $ = s=>document.querySelector(s);
+const view = ()=>document.getElementById("view");
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove("show"),2200);
+}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function moduleStepCount(i){
+  return MODULES[i].slides.length * 5; // each teaching slide + 4 activities
+}
+function moduleProgressPct(i){
+  const seen = state.progress[i].slidesSeen.size;
+  return Math.round(seen / moduleStepCount(i) * 100);
+}
+function overallPct(){
+  let total=0, seen=0;
+  MODULES.forEach((m,i)=>{ total+=moduleStepCount(i); seen+=state.progress[i].slidesSeen.size; });
+  return total? Math.round(seen/total*100):0;
+}
+
+/* ================= ROUTER ================= */
+function setTab(tab){
+  Speech.stop();
+  state.tab = tab;
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  render();
+}
+function render(){
+  const v = view();
+  if(state.tab==="home") v.innerHTML = renderHome();
+  else if(state.tab==="learn"){
+    if(state.modIndex!=null && state._inDeck) v.innerHTML = renderDeck();
+    else v.innerHTML = renderLearn();
+  }
+  else if(state.tab==="practice"){
+    if(state._inPassages) v.innerHTML = renderPassage();
+    else if(state.practiceType) v.innerHTML = renderTask();
+    else v.innerHTML = renderPracticeMenu();
+  }
+  else if(state.tab==="studio"){
+    if(state._inAIDeck) v.innerHTML = renderDeck();
+    else v.innerHTML = renderStudio();
+  }
+  else if(state.tab==="progress") v.innerHTML = renderProgress();
+  else if(state.tab==="account") v.innerHTML = renderAccount();
+  window.scrollTo(0,0);
+  bind();
+  persist();
+}
+
+/* ================= VIEWS ================= */
+function renderHome(){
+  const pct = overallPct();
+  return `
+    <div class="hero">
+      <h2>Become a confident writer ✍️</h2>
+      <p>Learn step by step — from a single sentence to full essays, articles, speeches and more — with guided slides you can also listen to.</p>
+      <div class="cta"><button class="btn btn-primary" data-go="continue">${pct>0?'Continue learning':'Start Module 1'} →</button><button class="btn" id="installBtn" style="display:none;margin-left:8px">⬇ Install app</button></div>
+    </div>
+    <h1 class="view-title">Your learning path</h1>
+    <p class="view-sub">${MODULES.length} modules across four sections take you from the basics to full compositions. Tap any to begin.</p>
+    <div class="modules">
+      ${MODULES.map((m,i)=>moduleCard(m,i)).join("")}
+    </div>
+    <div class="ai-card" style="margin-top:18px;background:linear-gradient(150deg,#6b3fa0,#3f2363);border:none">
+      <h3 style="color:#fff">✦ AI Studio</h3>
+      <p class="desc" style="color:rgba(255,255,255,.85)">Beyond the core course: ask Claude to build unlimited lessons & slides on ANY topic, get instant AI feedback on your writing, and chat with an AI tutor.</p>
+      <button class="btn aiprimary btn-block" data-go="studio">Open AI Studio →</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="tip" style="margin-top:18px"><b>How to use Inkwell:</b> <b>Learn</b> a module's slides (tap 🔊 to listen), then open <b>Practice</b> to rewrite samples, find main points, build from points and answer questions — with model answers, a self-check, and live <b>AI feedback</b>. Use the <b>Studio</b> tab to generate new lessons and ask the AI tutor anything.</div>
+  `;
+}
+// Free modules (usable without an account); the rest unlock with credits.
+function isUnlocked(i){ return true; }  // all modules are free/open
+function moduleCard(m,i){
+  const pct = moduleProgressPct(i);
+  const done = state.progress[i].done;
+  return `
+    <div class="mod ${done?'done':''}" data-mod="${i}">
+      <div class="check">✓</div>
+      <div class="num" style="background:${m.color}">${m.n}</div>
+      <div class="meta">
+        <h3>${m.title}</h3>
+        <p>${m.blurb}</p>
+        <div class="tagrow">${m.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        <div class="mbar"><i style="width:${pct}%"></i></div>
+      </div>
+    </div>`;
+}
+
+// Group modules into the book's sections by module number.
+const SECTIONS = [
+  {title:"Building Blocks", note:"Sentences & their parts", from:1, to:1},
+  {title:"Structures of Writing", note:"Paragraphs & essays", from:2, to:11},
+  {title:"Writing Composition", note:"Letters, articles, speeches & more", from:12, to:25}
+];
+function sectionFor(n){
+  // adjust ranges to the actual module set present
+  if(n<=1) return 0;
+  if(n<=11) return 1;
+  return 2;
+}
+function renderLearn(){
+  // build section groups dynamically from whatever modules are loaded
+  const groups = [
+    {title:"Building Blocks", note:"Sentences — the foundation", items:[]},
+    {title:"Structures of Writing", note:"Paragraphs & essays", items:[]},
+    {title:"Writing Composition", note:"Letters, articles, speeches, reports & more", items:[]}
+  ];
+  MODULES.forEach((m,i)=> groups[sectionFor(m.n)].items.push(i));
+  const jump = groups.map((g,gi)=> g.items.length?`<button class="jump" data-jump="sec${gi}">${esc(g.title)}</button>`:'').join("");
+  const body = groups.map((g,gi)=>{
+    if(!g.items.length) return '';
+    const done = g.items.filter(i=>state.progress[i].done).length;
+    return `<div class="sec" id="sec${gi}">
+      <div class="sec-head"><div><h2>${esc(g.title)}</h2><span>${esc(g.note)}</span></div><div class="sec-count">${done}/${g.items.length}</div></div>
+      <div class="modules">${g.items.map(i=>moduleCard(MODULES[i],i)).join("")}</div>
+    </div>`;
+  }).join("");
+  return `
+    <h1 class="view-title">Learn</h1>
+    <p class="view-sub">${MODULES.length} modules in three parts. Tap a section to jump, then tap a module to start.</p>
+    <div class="jumpbar">${jump}</div>
+    ${body}
+  `;
+}
+
+const PTYPES = ['retype','retypeEx','ownideas','question'];
+
+// Composition modules produce a whole piece, so their per-slide practice scales to essays.
+const ESSAY_MODULE_IDS = new Set([
+  'article-writing','news-writing','advertisement','speech-writing','debate-writing',
+  'argumentative-essays','minutes-writing','report-writing','story-writing','creative-writing'
+]);
+function isEssayModule(i){ return MODULES[i] && ESSAY_MODULE_IDS.has(MODULES[i].id); }
+function deckStepsForModule(i){
+  const m = MODULES[i];
+  const steps = [];
+  m.slides.forEach((s,j)=>{
+    steps.push({type:'teach', data:s, slideIdx:j, modIdx:i});
+    PTYPES.forEach(pt=> steps.push({type:'practice', ptype:pt, slideIdx:j, modIdx:i}));
+  });
+  return steps;
+}
+function getDeck(){
+  if(state.deckSource==='ai'){
+    const L = state.aiLessons[state.aiLessonIndex] || {title:'Lesson', slides:[]};
+    const steps = (L.slides||[]).map((s,j)=>({type:'teach', data:s, slideIdx:j, ai:true}));
+    return {steps, title:L.title, kicker:'AI Lesson', ai:true, backTab:'studio', backLabel:'Studio'};
+  }
+  const m = MODULES[state.modIndex];
+  return {steps:deckStepsForModule(state.modIndex), title:m.title, kicker:'Module '+m.n, ai:false, backTab:'learn', backLabel:'Modules'};
+}
+function currentStep(){ const d=getDeck(); return d.steps[state.slideIndex]; }
+
+/* ---- per-slide practice content ---- */
+function pracKey(step){ return step.modIdx+':'+step.slideIdx+':'+step.ptype; }
+function liItems(html){
+  const d=document.createElement('div'); d.innerHTML=html||'';
+  return [...d.querySelectorAll('li')].map(li=>li.textContent.trim()).filter(Boolean);
+}
+// Pull a concise statement of the slide's concept (prefer the narration, which is plain prose).
+function conceptText(slide){
+  let t = (slide.say||'').trim();
+  // strip a leading "Welcome." / "Here ..." nicety if present, keep it natural otherwise
+  if(!t) t = stripHtml(slide.html);
+  return t;
+}
+// Pull the best worked example from a slide: a curated slide.example, else a .model,
+// else an .example, else first sentence-y block.
+function exampleText(slide){
+  if(slide.example && slide.example.trim()) return slide.example.trim();
+  const d=document.createElement('div'); d.innerHTML=slide.html||'';
+  const model = d.querySelector('.model');
+  if(model && model.textContent.trim()) return model.textContent.replace(/\s+/g,' ').trim();
+  const exGood = d.querySelector('.example.good') || d.querySelector('.example');
+  if(exGood && exGood.textContent.trim()) return exGood.textContent.replace(/\s+/g,' ').trim();
+  const call = d.querySelector('.callout');
+  if(call && call.textContent.trim()) return call.textContent.replace(/\s+/g,' ').trim();
+  // fallback: a representative sentence from the body
+  const txt = stripHtml(slide.html).replace(/\s+/g,' ').trim();
+  const m = txt.match(/[^.!?]{20,}[.!?]/);
+  return (m ? m[0] : txt).trim();
+}
+function deriveTask(step){
+  const slide = MODULES[step.modIdx].slides[step.slideIdx];
+  const topic = slide.h;
+  const essay = isEssayModule(step.modIdx);
+  const piece = essay ? "piece" : "paragraph";
+
+  if(step.ptype==='retype'){
+    const concept = conceptText(slide);
+    return {generic:true, kind:'copy', source:concept,
+      instruction:`Re-type the idea of this slide in the box below. Copying it in your own hand helps it stick — then, if you can, add one sentence of your own explaining it.`,
+      model:concept,
+      rubric:["I re-typed the concept accurately","Spelling & punctuation match","(Bonus) I added a sentence in my own words"]};
+  }
+
+  if(step.ptype==='retypeEx'){
+    const ex = exampleText(slide);
+    return {generic:true, kind:'copy', source:ex,
+      instruction: essay
+        ? `Re-type this model below, exactly. Typing a strong model trains your hand and ear for how a good ${piece} flows.`
+        : `Re-type this example below, exactly as it is. Copying good writing trains your ear for it.`,
+      model:ex,
+      rubric:["I re-typed the example accurately","Punctuation & capitals match","I read it back aloud once"]};
+  }
+
+  if(step.ptype==='ownideas'){
+    const items = liItems(slide.html);
+    const points = items.length ? items.slice(0,5)
+      : [topic, "Give a clear example", essay?"Develop it fully across the piece":"End with a closing line"];
+    return {generic:true, points,
+      instruction: essay
+        ? `Use these ideas from “${topic}” to write your OWN full ${piece}. Plan it, then write it out completely.`
+        : `Use these ideas from “${topic}” to write your OWN short paragraph.`,
+      model: essay
+        ? `A strong ${piece} opens well, develops each idea above in its own part with examples, and closes with a clear ending — all on “${topic}”.`
+        : `A good paragraph opens with a topic sentence, develops each idea above with a short explanation or example, and ends with a closing sentence — all about “${topic}”.`,
+      rubric: essay
+        ? ["I used the ideas given","Clear opening, body and ending","I added examples/detail","It reads as one complete piece"]
+        : ["I used the ideas given","Topic sentence + closing sentence","I added an example or explanation","It stays on one idea (unity)"]};
+  }
+
+  // question
+  return {generic:true,
+    q: essay
+      ? `Write a FULL ${piece} that shows this slide's lesson: “${topic}”. Use everything you've learned so far in this module.`
+      : `Write a short piece (3–6 sentences) that clearly shows this slide's lesson: “${topic}”.`,
+    model: essay
+      ? `A strong answer is a complete ${piece}: a proper opening, a developed body that applies “${topic}”, and a clear conclusion.`
+      : `A strong answer applies the rule from “${topic}” correctly throughout, varies its sentences, and reads smoothly aloud.`,
+    rubric: essay
+      ? ["It's a complete piece (opening, body, ending)","It applies this slide's lesson","Examples/detail included","Reads smoothly aloud"]
+      : ["I applied the rule from this slide","My writing is clear and complete","It reads well aloud","Spelling & punctuation checked"]};
+}
+function getPracticeTask(step){
+  const cached = state.pracCache[pracKey(step)];
+  if(cached) return cached;
+  return deriveTask(step);
+}
+
+function audioBarHtml(){
+  return `<div class="audiobar" id="audiobar">
+    <button id="playBtn" aria-label="Play narration">
+      <svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <div class="wave">${Array.from({length:16}).map(()=>'<span></span>').join("")}</div>
+    <div class="lab" id="audioLab">Listen</div>
+    <button id="autoToggle" class="autotgl" title="Auto-play narration">${state.autoPlay?'Auto&nbsp;on':'Auto&nbsp;off'}</button>
+  </div>`;
+}
+
+function teachHtml(s, idx, total){
+  return `<div class="slide" id="slide">
+    <span class="badge">● ${esc(s.badge||'Slide')} · step ${idx+1}/${total}</span>
+    <h3>${esc(s.h)}</h3>
+    <div class="body">${s.html}</div>
+    ${audioBarHtml()}
+  </div>`;
+}
+function practiceStepHtml(step, idx, total){
+  const titles={retype:'Re-type the concept', retypeEx:'Re-type the example', ownideas:'Write your own', question:'Answer a question'};
+  const ic={retype:'⌨', retypeEx:'❝', ownideas:'✑', question:'?'};
+  const slide = MODULES[step.modIdx].slides[step.slideIdx];
+  const essay = isEssayModule(step.modIdx);
+  const t = getPracticeTask(step);
+  const fresh = !!state.pracCache[pracKey(step)];
+  let given='';
+  if(step.ptype==='retype' || step.ptype==='retypeEx'){
+    const label = step.ptype==='retype' ? 'Re-type this concept' : (essay ? 'Re-type this model' : 'Re-type this example');
+    given = `<div class="qlab">${label}</div><div class="given">${esc(t.source||t.model)}</div>`
+          + (t.instruction?`<p class="prompt" style="font-size:.88rem;color:var(--ink-soft)">💡 ${esc(t.instruction)}</p>`:'');
+  } else if(step.ptype==='ownideas'){
+    given = `<div class="qlab">${esc(t.instruction)}</div><div class="given"><ul>${t.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;
+  } else {
+    given = `<div class="qlab">Question</div><p class="prompt">${esc(t.q)}</p>`;
+  }
+  const ph = (step.ptype==='retype'||step.ptype==='retypeEx') ? 'Type it out here…'
+           : essay ? 'Write your full piece here…' : 'Write your answer here…';
+  return `<div class="slide" id="slide">
+    <span class="badge" style="color:var(--coral)">✎ Practice · step ${idx+1}/${total}</span>
+    <h3>${ic[step.ptype]} ${titles[step.ptype]}</h3>
+    <p style="font-size:.82rem;color:var(--ink-soft);margin:0 0 8px">For the slide: <b>${esc(slide.h)}</b>${essay?' · <span style="color:var(--gold-deep)">full piece</span>':''}</p>
+    ${audioBarHtml()}
+    ${given}
+    <textarea class="write" id="answer" placeholder="${ph}"></textarea>
+    <div class="wordcount" id="wc">0 words</div>
+    <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="revealBtn" style="flex:1;min-width:130px">${(step.ptype==='retype'||step.ptype==='retypeEx')?'Show again':(t.generic?'Reveal guidance':'Reveal model')}</button>
+      <button class="btn aiprimary" id="aiFeedback" style="flex:1;min-width:130px">AI feedback ✦</button>
+    </div>
+    <button class="btn btn-outline btn-block" id="genFresh" style="margin-top:9px;border-color:#6b3fa0;color:#6b3fa0">${fresh?'↻ Generate another (AI)':'✦ Generate a richer task for this slide (AI)'}</button>
+    <div id="revealArea"></div>
+    <div id="fbArea"></div>
+  </div>`;
+}
+function practiceSay(step){
+  const t = getPracticeTask(step);
+  if(step.ptype==='retype') return "Practice. Re-type the idea of this slide in your own hand. Copying it helps it stick.";
+  if(step.ptype==='retypeEx') return "Practice. Re-type this example exactly. Typing good writing trains your ear for it.";
+  if(step.ptype==='ownideas') return "Practice. "+t.instruction;
+  if(step.ptype==='question') return "Practice. "+t.q;
+  return "Practice time.";
+}
+function stepSay(step){
+  return step.type==='teach' ? (step.data.say || stripHtml(step.data.html)) : practiceSay(step);
+}
+
+function renderDeck(){
+  const d = getDeck();
+  const steps = d.steps;
+  const idx = state.slideIndex;
+  const step = steps[idx];
+  const total = steps.length;
+  const last = idx===total-1;
+  if(!d.ai){
+    state.progress[state.modIndex].slidesSeen.add(idx);
+    if(state.progress[state.modIndex].slidesSeen.size===total && !state.progress[state.modIndex].done)
+      state.progress[state.modIndex].done = true;
+  }
+  // compact bar for long decks, dots for short ones
+  let prog;
+  if(total>14){
+    const pctp = Math.round((idx+1)/total*100);
+    prog = `<div class="mbar" style="margin:0 0 14px"><i style="width:${pctp}%"></i></div>
+      <div style="font-size:.74rem;color:var(--ink-soft);text-align:right;margin:-8px 0 12px">Step ${idx+1} of ${total}</div>`;
+  } else {
+    prog = `<div class="progress-dots">${steps.map((st,k)=>`<i class="${k<idx?'on':''} ${k===idx?'cur':''} ${st.type==='practice'?'prac':''}"></i>`).join("")}</div>`;
+  }
+  const head = `
+    <div class="deck-head">
+      <button class="back" data-back="${d.backTab}">‹ ${d.backLabel}</button>
+      <div class="titlewrap"><div class="kicker">${esc(d.kicker)}</div><h2>${esc(d.title)}</h2></div>
+    </div>${prog}`;
+  const inner = step.type==='teach' ? teachHtml(step.data, idx, total) : practiceStepHtml(step, idx, total);
+  const nav = `
+    <div class="deck-nav">
+      <button class="btn btn-outline" data-prev ${idx===0?'disabled':''}>‹ Back</button>
+      ${ last
+        ? `<button class="btn btn-primary" data-finish>${d.ai?'Done ✓':'Finish ✓'}</button>`
+        : `<button class="btn btn-primary" data-next>Next ›</button>` }
+    </div>`;
+  return head + inner + nav;
+}
+
+function renderPracticeMenu(){
+  const types = [
+    {key:"rewrite", color:"#c75b39", ic:"✎", h:"Rewrite the sample", p:"Improve a weak piece of writing and compare with a model."},
+    {key:"points", color:"#2c604a", ic:"☰", h:"Find the main points", p:"Read a passage and pull out its key ideas."},
+    {key:"frompoints", color:"#a87f25", ic:"⊕", h:"Write from points", p:"You're given the points — turn them into good writing."},
+    {key:"question", color:"#1f4636", ic:"?", h:"Answer a question", p:"Plan and write your own response to a real prompt."}
+  ];
+  return `
+    <h1 class="view-title">Practice</h1>
+    <p class="view-sub">Four ways to practise. Pick a module below, then choose an activity. Every task comes with a model answer and a self-check.</p>
+    <label style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600">Practising</label>
+    <select id="modSelect" style="width:100%;margin:6px 0 18px;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:#fffdf6;font-family:'Spectral',serif;font-size:1rem;color:var(--ink)">
+      ${MODULES.map((m,i)=>`<option value="${i}" ${i===state.modIndex?'selected':''}>Module ${m.n}: ${m.title}</option>`).join("")}
+    </select>
+    <div class="ptype">
+      ${types.map(t=>`
+        <div class="ptype-card" data-ptype="${t.key}">
+          <div class="ic" style="background:${t.color}">${t.ic}</div>
+          <div><h3>${t.h}</h3><p>${t.p}</p></div>
+        </div>`).join("")}
+      ${MODULES[state.modIndex] && MODULES[state.modIndex].passages ? `
+        <div class="ptype-card" data-passages="1" style="border:1.5px solid #6b3fa0">
+          <div class="ic" style="background:#6b3fa0">📑</div>
+          <div><h3>Passage Bank (${MODULES[state.modIndex].passages.length}) ✦</h3><p>${MODULES[state.modIndex].passageType==='summary'?'Read a full passage, write your summary, and let the AI mark it.':'Read a full passage, answer the questions, and let the AI mark your answers.'}</p></div>
+        </div>` : ''}
+    </div>
+  `;
+}
+
+function renderPassage(){
+  const m = MODULES[state.modIndex];
+  const list = m.passages || [];
+  const i = state.passageIndex % (list.length||1);
+  const p = list[i];
+  const isSummary = m.passageType==='summary';
+  const qBlock = isSummary
+    ? `<div class="qlab">${esc(p.instruction)}</div>
+       <textarea class="write" id="ans0" placeholder="Write your summary here…" style="min-height:120px"></textarea>`
+    : p.questions.map((q,qi)=>`
+        <div style="margin-top:12px">
+          <div class="qlab" style="margin-bottom:4px"><b>Q${qi+1}.</b> ${esc(q)}</div>
+          <textarea class="write" id="ans${qi}" placeholder="Your answer to Q${qi+1}…" style="min-height:54px"></textarea>
+        </div>`).join("");
+  return `
+    <div class="deck-head">
+      <button class="back" data-passback="1">‹ Activities</button>
+      <div class="titlewrap"><div class="kicker">Module ${m.n} · ${esc(m.title)}</div><h2>Passage ${i+1} of ${list.length}</h2></div>
+    </div>
+    <div class="task">
+      <h3 style="font-family:'Fraunces',serif;margin:0 0 8px;color:var(--green)">${esc(p.title)}</h3>
+      <div class="given" style="line-height:1.6;white-space:normal">${esc(p.text)}</div>
+      <div style="margin-top:6px"><button class="listen-mini" id="listenPassage">🔊 Listen to the passage</button></div>
+      <div style="margin-top:14px">${qBlock}</div>
+      <button class="btn aiprimary btn-block" id="markPassage" style="margin-top:14px">✦ Submit for AI marking</button>
+      <button class="btn btn-primary btn-block" id="revealPassage" style="margin-top:9px">📘 Reveal model answers</button>
+      <div id="passReveal"></div>
+      <div id="passFb"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-outline" id="prevPassage" style="flex:1" ${i===0?'disabled':''}>‹ Previous</button>
+      <button class="btn btn-outline" id="nextPassage" style="flex:1" ${i>=list.length-1?'disabled':''}>Next passage ›</button>
+    </div>
+  `;
+}
+
+
+function renderTask(){
+  const m = MODULES[state.modIndex];
+  const list = m.practice[state.practiceType] || [];
+  const idx = state.practiceTaskIndex % (list.length||1);
+  const task = list[idx];
+  const titles = {rewrite:"Rewrite the sample", points:"Find the main points", frompoints:"Write from points", question:"Answer a question"};
+
+  if(!task){
+    return `<div class="deck-head"><button class="back" data-back="practice">‹ Activities</button><div class="titlewrap"><div class="kicker">${m.title}</div><h2>${titles[state.practiceType]}</h2></div></div>
+      <div class="task"><p>No task available for this module yet.</p></div>`;
+  }
+
+  let given = "";
+  if(state.practiceType==="rewrite"){
+    given = `<div class="qlab">Improve this weak writing</div>
+      <div class="given">${esc(task.weak)}</div>
+      <p class="prompt" style="font-size:.92rem;color:var(--ink-soft)">💡 ${esc(task.hint)}</p>`;
+  } else if(state.practiceType==="points"){
+    given = `<div class="qlab">Read carefully, then list the main points</div>
+      <div class="given">${esc(task.passage)}</div>`;
+  } else if(state.practiceType==="frompoints"){
+    given = `<div class="qlab">${esc(task.instruction)}</div>
+      <div class="given"><ul>${task.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;
+  } else if(state.practiceType==="question"){
+    given = `<div class="qlab">Question</div><p class="prompt">${esc(task.q)}</p>`;
+  }
+
+  return `
+    <div class="deck-head">
+      <button class="back" data-back="practice">‹ Activities</button>
+      <div class="titlewrap"><div class="kicker">Module ${m.n} · ${m.title}</div><h2>${titles[state.practiceType]}</h2></div>
+    </div>
+    <div class="task">
+      ${given}
+      <textarea class="write" id="answer" placeholder="Write your answer here..."></textarea>
+      <div class="wordcount" id="wc">0 words</div>
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="btn btn-primary" id="revealBtn" style="flex:1">Reveal model</button>
+        <button class="btn aiprimary" id="aiFeedback" style="flex:1">AI feedback ✦</button>
+      </div>
+      <div id="revealArea"></div>
+      <div id="fbArea"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      ${list.length>1?`<button class="btn btn-outline" id="nextTask" style="flex:1">Next task ›</button>`:``}
+      <button class="btn btn-outline" data-back="practice" style="flex:1">Try another activity</button>
+    </div>
+  `;
+}
+
+function activePractice(){
+  // In a learning deck (module), the current step may be a practice step.
+  if(state.tab==='learn' && state._inDeck && state.deckSource==='module'){
+    const step=currentStep();
+    if(step && step.type==='practice') return {ptype:step.ptype, task:getPracticeTask(step), step};
+    return null;
+  }
+  // Standalone Practice tab.
+  const m=MODULES[state.modIndex]; const list=m.practice[state.practiceType];
+  if(!list) return null;
+  return {ptype:state.practiceType, task:list[state.practiceTaskIndex % list.length]};
+}
+function buildReveal(ptype, task){
+  let modelHtml = "";
+  if(ptype==="points" && Array.isArray(task.model)){
+    modelHtml = `<div class="model"><b>${task.generic?'How to do it well:':'Main points to look for:'}</b><ul style="margin:8px 0 0;padding-left:1.1em">${task.model.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;
+  } else {
+    modelHtml = `<div class="model">${esc(task.model).replace(/\n/g,"<br>")}</div>`;
+  }
+  const rubric = (task.rubric||[
+    "I answered the full question","My writing makes sense when read aloud","I checked spelling and punctuation"
+  ]);
+  const modelText = Array.isArray(task.model) ? task.model.join(". ") : (task.model||"");
+  const head = task.kind==='copy' ? '📋 The text to copy' : (task.generic?'💡 Guidance':'📘 Model answer');
+  return `
+    <div class="reveal">
+      <h4>${head} <button class="listen-mini" id="listenModel" title="Listen">🔊 Listen</button></h4>
+      ${modelHtml}
+      <h4>✅ Self-check — tick what your answer did</h4>
+      <ul class="rubric" id="rubric">
+        ${rubric.map((r,i)=>`<li><input type="checkbox" data-rb="${i}"><span>${esc(r)}</span></li>`).join("")}
+      </ul>
+      <div class="scorebox" id="scorebox"></div>
+      <input type="hidden" id="modelText" value="${esc(modelText)}">
+    </div>
+  `;
+}
+
+function updateCreditPill(){
+  const el=document.getElementById("creditNum");
+  if(el) el.textContent = state.account ? (state.account.credits|0).toLocaleString() : "—";
+}
+const PACKS = [60,120,180,240,300,360,420,480,540,600];
+function renderAccount(){
+  if(!loggedIn()){
+    return `
+      <h1 class="view-title">Account</h1>
+      <p class="view-sub">Create an account with your phone number to buy credits and use the AI tutor, marking and narration.</p>
+      <div class="ai-card">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="btn ${state._authMode!=='signup'?'btn-primary':'btn-outline'}" id="tabLogin" style="flex:1">Log in</button>
+          <button class="btn ${state._authMode==='signup'?'btn-primary':'btn-outline'}" id="tabSignup" style="flex:1">Sign up</button>
+        </div>
+        <div class="field"><label>Phone number</label><input id="authPhone" inputmode="tel" placeholder="0XX XXX XXXX" value="${esc(state._authPhone||'')}"></div>
+        <div class="field"><label>PIN (at least 4 digits)</label><input id="authPin" inputmode="numeric" type="password" placeholder="••••"></div>
+        <button class="btn aiprimary btn-block" id="authGo">${state._authMode==='signup'?'Create account (get 500 free credits)':'Log in'}</button>
+        <div class="ai-note" id="authMsg" style="display:none"></div>
+      </div>
+      <div class="ai-note">The whole course, practice, model answers and narration work free, even offline. An account is only for the live <b>AI tutor, AI marking</b> and natural <b>AI voice</b> (paid with credits).</div>
+      <details style="margin-top:12px"><summary style="cursor:pointer;color:var(--ink-soft);font-size:.85rem">Advanced: server settings</summary>
+        <div class="field" style="margin-top:8px"><label>Server URL${DEFAULT_API_BASE?' (default set)':''}</label><input id="apiBase" placeholder="${DEFAULT_API_BASE||'https://your-backend.workers.dev'}" value="${esc(state.apiBase||'')}"></div>
+        <button class="btn btn-outline btn-block" id="saveApi">Save server URL</button>
+      </details>`;
+  }
+  // logged in
+  const a = state.account;
+  return `
+    <h1 class="view-title">Account</h1>
+    <p class="view-sub">Signed in as ${esc(a.phone)}</p>
+    <div class="ai-card" style="background:linear-gradient(150deg,#1f4636,#163528);border:none;color:#fff">
+      <div style="font-size:.8rem;opacity:.85;letter-spacing:.1em;text-transform:uppercase">Your balance</div>
+      <div style="font-family:'Fraunces',serif;font-weight:800;font-size:2rem;color:var(--gold)">✦ ${(a.credits|0).toLocaleString()} <span style="font-size:1rem;color:#fff;opacity:.8">credits</span></div>
+    </div>
+
+    <h2 style="font-family:'Fraunces',serif;color:var(--ink);font-size:1.1rem;margin:18px 2px 4px">Buy credits</h2>
+    <p style="font-size:.84rem;color:var(--ink-soft);margin:0 2px 10px">Rate: <b>GHS 60 = 10,000 credits</b>. Pay securely with Flutterwave (Mobile Money or card).</p>
+    <div class="packs">
+      ${PACKS.map(c=>`<button class="pack" data-pack="${c}"><div class="amt">GHS ${c}</div><div class="cr">${Math.round(c*10000/60).toLocaleString()} credits</div></button>`).join("")}
+    </div>
+
+    <div class="ai-note" style="margin-top:14px"><b>What credits buy:</b> AI tutor reply — 50 · AI marking — 80 · AI narration clip — 20.</div>
+
+    <button class="btn btn-outline btn-block" id="refreshBal" style="margin-top:14px">↻ Refresh balance</button>
+    <button class="btn btn-outline btn-block" id="logout" style="margin-top:8px;border-color:var(--coral);color:var(--coral)">Log out</button>`;
+}
+
+
+function renderProgress(){
+  const pct = overallPct();
+  const r = 42, c = 2*Math.PI*r, off = c*(1-pct/100);
+  const modsDone = state.progress.filter(p=>p.done).length;
+  const slidesSeen = state.progress.reduce((a,p)=>a+p.slidesSeen.size,0);
+  const tips = [
+    "Read your writing aloud — your ear catches what your eye misses.",
+    "Plan for 5 minutes before any essay. It always saves time.",
+    "Keep a notebook of new words and use one in your next paragraph.",
+    "One idea per paragraph. When the idea changes, start a new one.",
+    "Swap weak words like 'very' and 'nice' for precise, vivid ones."
+  ];
+  const tip = tips[Math.floor(Math.random()*tips.length)];
+  return `
+    <h1 class="view-title">Your progress</h1>
+    <p class="view-sub">Keep going — consistency is how writers are made.</p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/>
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--green)" stroke-width="9"
+          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"
+          transform="rotate(-90 50 50)" style="transition:stroke-dashoffset .8s ease"/>
+        <text x="50" y="50" text-anchor="middle" dy=".35em" font-family="Fraunces,serif" font-weight="800" font-size="22" fill="var(--green)">${pct}%</text>
+      </svg>
+      <div class="info">
+        <h3>${pct===100?'Course complete! 🎉':'Course progress'}</h3>
+        <p>${pct===100?'You have the full writer\'s toolkit.':'Every slide you finish moves the ring forward.'}</p>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><b>${modsDone}/${MODULES.length}</b><span>Modules completed</span></div>
+      <div class="stat"><b>${slidesSeen}</b><span>Slides studied</span></div>
+      <div class="stat"><b>${state.practiceDone}</b><span>Practice tasks done</span></div>
+      <div class="stat"><b>${state.streak} 🔥</b><span>Day streak</span></div>
+    </div>
+    <h1 class="view-title" style="font-size:1.2rem">Modules</h1>
+    <div class="modules">${MODULES.map((m,i)=>{
+      const p=moduleProgressPct(i);
+      return `<div class="mod ${state.progress[i].done?'done':''}" data-mod="${i}">
+        <div class="check">✓</div>
+        <div class="num" style="background:${m.color}">${m.n}</div>
+        <div class="meta"><h3>${m.title}</h3>
+          <div class="mbar"><i style="width:${p}%"></i></div></div>
+      </div>`;}).join("")}</div>
+    <div class="tip" style="margin-top:18px"><b>Writer's tip:</b> ${tip}</div>
+    <p style="font-size:.76rem;color:var(--ink-soft);margin:16px 2px 6px">${Store.ok?'✓ Your progress and generated lessons are saved on this device.':'⚠️ Storage is disabled here, so progress won\'t be saved between sessions.'}</p>
+    <button class="btn btn-outline btn-block" id="resetBtn" style="border-color:var(--coral);color:var(--coral)">Reset all progress</button>
+  `;
+}
+
+/* ================= AI STUDIO (powered by Claude) ================= */
+function renderStudio(){
+  return `
+    <h1 class="view-title">AI Studio <span class="ai-badge">✦ Claude</span></h1>
+    <p class="view-sub">Generate brand-new lessons & slides on any writing topic, get instant feedback, and ask a tutor — all powered live by Claude.</p>
+
+    <div class="ai-card">
+      <h3>✦ Create a lesson</h3>
+      <p class="desc">Type any writing topic. Claude builds a full slide deck with examples and audio narration — added straight into your app.</p>
+      <div class="field"><label>Topic</label><input id="aiTopic" placeholder="e.g. Writing a formal letter"></div>
+      <div class="field"><label>Level</label>
+        <select id="aiLevel">
+          <option>Beginner (JHS / BECE)</option>
+          <option selected>Intermediate (SHS / WASSCE)</option>
+          <option>Advanced</option>
+        </select>
+      </div>
+      <button class="btn aiprimary btn-block" id="genLesson">Generate lesson ✦</button>
+      <div class="ai-note" id="aiNote" style="display:none"></div>
+    </div>
+
+    ${state.aiLessons.length ? `<div class="ai-card">
+      <h3>Your generated lessons</h3>
+      ${state.aiLessons.map((L,i)=>`<div class="lesson-chip" data-ailesson="${i}">
+        <div class="dot">✦</div>
+        <div><b>${esc(L.title)}</b><span>${L.slides.length} slides · tap to study</span></div>
+      </div>`).join("")}
+    </div>` : ''}
+
+    <div class="ai-card">
+      <h3>✦ Ask the AI Tutor</h3>
+      <p class="desc">Stuck on grammar, structure or word choice? Ask anything about writing.</p>
+      <div class="chat" id="chat">${renderChat()}</div>
+      <div class="chatbar"><input id="chatInput" placeholder="Ask a writing question..."><button id="chatSend" aria-label="Send">➤</button></div>
+    </div>
+
+    <div class="ai-card">
+      <h3>⚙️ AI connection (for real devices)</h3>
+      <p class="desc">On a published phone app, AI calls must go through your own server so your API key stays private. Deploy the included Cloudflare Worker, then paste its URL here.</p>
+      <div class="field"><label>AI proxy URL</label><input id="proxyUrl" placeholder="https://your-worker.workers.dev" value="${esc(state.proxyUrl||'')}"></div>
+      <button class="btn aiprimary btn-block" id="saveProxy">Save connection</button>
+      <button class="btn btn-block" id="testProxy" style="margin-top:8px">⚡ Test connection</button>
+      <div class="ai-note" id="proxyStatus" style="${state.proxyUrl?'':'display:none'}">${state.proxyUrl?'✓ Using your proxy: '+esc(state.proxyUrl):''}</div>
+    </div>
+
+    <div class="ai-card">
+      <h3>🔊 AI voice narration</h3>
+      <p class="desc">Replace the device's built-in voice with a natural AI voice (OpenAI text-to-speech) for slides and model answers. Requires the proxy above with an OpenAI key set.</p>
+      <label class="switch"><input type="checkbox" id="aiVoiceToggle" ${state.aiVoice?'checked':''}> <span>Use AI voice for narration</span></label>
+      <div class="field" style="margin-top:10px"><label>Voice</label>
+        <select id="ttsVoice">
+          ${['alloy','ash','ballad','coral','echo','fable','nova','onyx','sage','shimmer'].map(v=>`<option value="${v}" ${state.ttsVoice===v?'selected':''}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join("")}
+        </select>
+      </div>
+      <button class="btn btn-block" id="testVoice">▶ Test this voice</button>
+      <div class="ai-note">🔈 <b>Disclosure:</b> AI voice narration is computer-generated, not a human voice. It needs an internet connection; audio is cached after first play. If AI voice is off or unavailable, the device's built-in voice is used.</div>
+    </div>
+
+    <div class="ai-note"><b>How the AI works:</b> Inside Claude (this preview) AI runs with no setup. On a real device, set the proxy above. Either way, the full course, embedded practice, model answers and narration work <b>offline</b> with the device voice — AI voice is an optional upgrade.</div>
+  `;
+}
+function renderChat(){
+  if(!state.chat.length)
+    return `<div class="msg ai">Hi! I'm your writing tutor 😊 Ask me about sentences, paragraphs, essays, grammar — anything at all.</div>`;
+  return state.chat.map(m=>`<div class="msg ${m.role==='user'?'me':'ai'}">${esc(m.text)}</div>`).join("");
+}
+function renderFeedback(fb){
+  const s = Math.max(0, Math.min(100, Math.round(fb.score||0)));
+  return `<div class="fb">
+    <div class="scorebadge">Score: ${s}/100</div>
+    <h4>💪 What you did well</h4>
+    <ul>${(fb.strengths||[]).map(x=>`<li>${esc(x)}</li>`).join("") || '<li>—</li>'}</ul>
+    <h4>🎯 How to improve</h4>
+    <ul>${(fb.improve||[]).map(x=>`<li>${esc(x)}</li>`).join("") || '<li>—</li>'}</ul>
+    <h4>✍️ An improved version of your writing</h4>
+    <div class="corrected">${esc(fb.corrected||'')}</div>
+    <div class="enc">${esc(fb.encouragement||'Keep writing — you are improving every day!')}</div>
+  </div>`;
+}
+
+/* --- Backend (accounts, credits, payments) --- */
+/* Set this ONCE to your deployed backend URL, e.g.
+   "https://inkwell-backend.yourname.workers.dev". Then users never see a
+   "connect server" step. They can still override it under Account → Advanced. */
+const DEFAULT_API_BASE = "";
+function apiBase(){ return (state.apiBase||DEFAULT_API_BASE||state.proxyUrl||"").trim().replace(/\/+$/,''); }
+function loggedIn(){ return !!(state.token && state.account); }
+async function api(pathname, opts){
+  const base = apiBase();
+  if(!base) throw new Error("No server set. Open Account → connect your Inkwell server URL.");
+  const headers = Object.assign({"Content-Type":"application/json"}, (opts&&opts.headers)||{});
+  if(state.token) headers["Authorization"] = "Bearer "+state.token;
+  let res;
+  try{ res = await fetch(base+pathname, Object.assign({}, opts, {headers})); }
+  catch(e){ throw new Error("Couldn't reach the server. Check your connection."); }
+  const ct = res.headers.get("Content-Type")||"";
+  if(ct.includes("application/json")){
+    const data = await res.json();
+    if(!res.ok){
+      if(res.status===402){ const err=new Error(data.error||"Not enough credits."); err.code=402; err.need=data.need; err.credits=data.credits; throw err; }
+      if(res.status===401){ const err=new Error("Please log in again."); err.code=401; throw err; }
+      throw new Error(data.error||("Request failed ("+res.status+")"));
+    }
+    if(typeof data.credits==="number" && state.account){ state.account.credits=data.credits; persist(); updateCreditPill(); }
+    return data;
+  }
+  if(!res.ok) throw new Error("Request failed ("+res.status+")");
+  return res; // binary (e.g. TTS mp3)
+}
+
+/* --- Claude calls: through the backend (charges credits) when logged in,
+       else fall back to the legacy direct proxy (for testing inside Claude). --- */
+async function callClaude(system, userText, purpose){
+  if(loggedIn()){
+    const data = await api("/ai", {method:"POST", body: JSON.stringify({system, userText, purpose:purpose||"tutor", model:"claude-sonnet-4-6", max_tokens:1000})});
+    return data.text||"";
+  }
+  // legacy path (no account): direct proxy / in-Claude
+  const usingProxy = !!(state.proxyUrl && state.proxyUrl.trim());
+  const endpoint = usingProxy ? state.proxyUrl.trim() : "https://api.anthropic.com/v1/messages";
+  let res;
+  try{
+    res = await fetch(endpoint, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:1000, system, messages:[{role:"user", content:userText}] })
+    });
+  }catch(e){
+    if(!usingProxy) throw new Error("Can't reach Claude directly from a browser. Log in to your Inkwell account (Account tab) to use AI with credits.");
+    throw new Error("Couldn't reach your AI proxy. Check the URL is correct and the server is deployed.");
+  }
+  if(!res.ok){
+    let detail="";
+    try{ const j=await res.json(); detail = j.error?.message || j.error || ""; }catch(e){}
+    if(res.status===401||res.status===403) throw new Error("AI key was rejected (401/403). "+detail);
+    if(res.status===429) throw new Error("Rate limit reached (429). "+detail);
+    if(res.status>=500) throw new Error("The AI server had a problem ("+res.status+"). "+detail);
+    throw new Error("AI request failed ("+res.status+"). "+detail);
+  }
+  const data = await res.json();
+  return (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+}
+function extractJSON(t){
+  let s = (t||"").trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+  const a = s.indexOf('{'), b = s.lastIndexOf('}');
+  if(a>=0 && b>a) s = s.slice(a, b+1);
+  return JSON.parse(s);
+}
+function stripHtml(h){ const d=document.createElement('div'); d.innerHTML=h||''; return d.textContent||''; }
+
+/* ================= EVENT BINDING ================= */
+function bind(){
+  // tab bar handled once globally; here bind view-specific
+  document.querySelectorAll("[data-go='continue']").forEach(b=>b.onclick=()=>{
+    // go to first not-done module
+    let i = state.progress.findIndex(p=>!p.done);
+    if(i<0) i=0;
+    openModule(i);
+  });
+  document.querySelectorAll("[data-mod]").forEach(el=>el.onclick=()=>openModule(+el.dataset.mod));
+  document.querySelectorAll("[data-jump]").forEach(b=>b.onclick=()=>{
+    const el=document.getElementById(b.dataset.jump);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+  document.querySelectorAll("[data-go='studio']").forEach(b=>b.onclick=()=>{
+    state._inDeck=false; state._inAIDeck=false; setTab("studio");
+  });
+  const inst=$("#installBtn");
+  if(inst){
+    if(window._deferredInstall) inst.style.display="inline-flex";
+    inst.onclick=async ()=>{
+      const ev=window._deferredInstall;
+      if(!ev){ toast("Use your browser menu → 'Add to Home screen'."); return; }
+      ev.prompt();
+      try{ await ev.userChoice; }catch(e){}
+      window._deferredInstall=null; inst.style.display="none";
+    };
+  }
+  const reset=$("#resetBtn");
+  if(reset) reset.onclick=()=>{
+    if(confirm("Reset all progress, generated lessons and tutor chat on this device? This cannot be undone.")){
+      resetAll(); toast("Progress reset."); render();
+    }
+  };
+  document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{
+    Speech.stop();
+    const t=b.dataset.back;
+    state._inDeck=false; state._inAIDeck=false;
+    if(t==="learn"){ setTab("learn"); }
+    else if(t==="practice"){ state.practiceType=null; state._inPassages=false; setTab("practice"); }
+    else if(t==="studio"){ setTab("studio"); }
+  });
+
+  // deck nav
+  const nb=$("[data-next]"); if(nb) nb.onclick=()=>{ Speech.stop(); state.slideIndex++; render(); };
+  const pb=$("[data-prev]"); if(pb) pb.onclick=()=>{ Speech.stop(); state.slideIndex--; render(); };
+  const fb=$("[data-finish]"); if(fb) fb.onclick=()=>{
+    Speech.stop();
+    if(state.deckSource==='ai'){ state._inAIDeck=false; toast("Lesson complete! ✦"); setTab("studio"); return; }
+    state.progress[state.modIndex].done=true;
+    toast("Module complete! 🎉 Time to practise.");
+    state._inDeck=false; setTab("practice");
+  };
+
+  // audio
+  const playBtn=$("#playBtn");
+  if(playBtn){
+    const step=currentStep();
+    playBtn.onclick=()=>{ Speech.toggle(stepSay(step), (st)=>setAudioUI(st)); };
+  }
+  const at=$("#autoToggle");
+  if(at) at.onclick=()=>{
+    state.autoPlay=!state.autoPlay;
+    at.innerHTML = state.autoPlay ? 'Auto&nbsp;on' : 'Auto&nbsp;off';
+    if(!state.autoPlay){ Speech.stop(); setAudioUI('ended'); }
+    else triggerAutoPlay();
+    persist();
+  };
+  // start narration automatically when a deck slide is shown
+  if(playBtn && state.autoPlay && Speech.supported){
+    clearTimeout(window.__ap);
+    window.__ap=setTimeout(triggerAutoPlay, 280);
+  }
+
+  bindStudio();
+
+  // practice menu
+  const ms=$("#modSelect"); if(ms) ms.onchange=()=>{ state.modIndex=+ms.value; };
+  document.querySelectorAll("[data-ptype]").forEach(c=>c.onclick=()=>{
+    state.practiceType=c.dataset.ptype; state.practiceTaskIndex=0; render();
+  });
+  const pbCard=document.querySelector("[data-passages]");
+  if(pbCard) pbCard.onclick=()=>{ state._inPassages=true; state.passageIndex=0; Speech.stop(); render(); };
+  if($("[data-passback]")) $("[data-passback]").onclick=()=>{ state._inPassages=false; Speech.stop(); render(); };
+  const pPrev=$("#prevPassage"), pNext=$("#nextPassage");
+  if(pPrev) pPrev.onclick=()=>{ if(state.passageIndex>0){ state.passageIndex--; Speech.stop(); render(); } };
+  if(pNext) pNext.onclick=()=>{ const L=(MODULES[state.modIndex].passages||[]).length; if(state.passageIndex<L-1){ state.passageIndex++; Speech.stop(); render(); } };
+  const lp=$("#listenPassage");
+  if(lp) lp.onclick=()=>{
+    const m=MODULES[state.modIndex]; const p=(m.passages||[])[state.passageIndex%((m.passages||[]).length||1)];
+    if(!p) return;
+    if(lp._on){ Speech.stop(); lp._on=false; lp.innerHTML="🔊 Listen to the passage"; return; }
+    lp.innerHTML="⏳ …"; Speech.speak(p.text, ()=>{ lp._on=false; lp.innerHTML="🔊 Listen to the passage"; }); lp._on=true; lp.innerHTML="⏸ Stop";
+  };
+  const rp=$("#revealPassage");
+  if(rp) rp.onclick=()=>{
+    const m=MODULES[state.modIndex]; const list=m.passages||[];
+    const p=list[state.passageIndex%(list.length||1)]; if(!p) return;
+    const isSummary=m.passageType==='summary';
+    let html;
+    if(isSummary){
+      html=`<div class="reveal"><h4>📘 Model summary <button class="listen-mini" id="listenModelP" title="Listen">🔊 Listen</button></h4>
+        <div class="model">${esc(p.model||'')}</div>
+        <p style="font-size:.82rem;color:var(--ink-soft);margin:8px 0 0">Yours need not match word for word — check that you captured the same main points, in simple sentences, with no colouring words.</p>
+        <input type="hidden" id="modelPText" value="${esc(p.model||'')}"></div>`;
+    } else {
+      html=`<div class="reveal"><h4>📘 Model answers <button class="listen-mini" id="listenModelP" title="Listen">🔊 Listen</button></h4>
+        <ol style="margin:6px 0 0;padding-left:1.2em">${(p.answers||[]).map(a=>`<li style="margin-bottom:6px">${esc(a)}</li>`).join("")}</ol>
+        <p style="font-size:.82rem;color:var(--ink-soft);margin:8px 0 0">Compare with your own answers. Remember: keep answers short and do not repeat the question.</p>
+        <input type="hidden" id="modelPText" value="${esc((p.answers||[]).map((a,k)=>'Answer '+(k+1)+'. '+a).join(' '))}"></div>`;
+    }
+    $("#passReveal").innerHTML=html;
+    rp.textContent="Model answers shown below ↓"; rp.disabled=true;
+    const lm=$("#listenModelP");
+    if(lm) lm.onclick=()=>{ const t=($("#modelPText")?.value||""); if(!t) return; if(lm._on){ Speech.stop(); lm._on=false; lm.innerHTML="🔊 Listen"; return;} lm.innerHTML="⏳ …"; Speech.speak(t, ()=>{ lm._on=false; lm.innerHTML="🔊 Listen"; }); lm._on=true; lm.innerHTML="⏸ Stop"; };
+    $("#passReveal").scrollIntoView({behavior:"smooth",block:"start"});
+  };
+  const mp=$("#markPassage");
+  if(mp) mp.onclick=async()=>{
+    const m=MODULES[state.modIndex]; const list=m.passages||[];
+    const p=list[state.passageIndex%(list.length||1)]; if(!p) return;
+    const isSummary=m.passageType==='summary';
+    let answersBlock="";
+    if(isSummary){
+      const a=($("#ans0")?.value||"").trim();
+      if(!a){ toast("Write your summary first."); return; }
+      answersBlock="STUDENT'S SUMMARY:\n"+a;
+    } else {
+      const parts=[]; let any=false;
+      p.questions.forEach((q,qi)=>{ const a=($("#ans"+qi)?.value||"").trim(); if(a) any=true; parts.push(`Q${qi+1}: ${q}\nStudent answer: ${a||'(blank)'}`); });
+      if(!any){ toast("Answer at least one question first."); return; }
+      answersBlock="QUESTIONS AND THE STUDENT'S ANSWERS:\n"+parts.join("\n\n");
+    }
+    const sys = isSummary
+      ? `You are a kind Ghanaian English teacher marking a SUMMARY. The student read a passage and wrote a summary. Judge whether they captured the passage's main points as simple sentences, in their own words, with NO colouring words (adjectives/adverbs/idioms), adding nothing and leaving nothing out. Output ONLY minified JSON: {"score":number 0-100,"strengths":[string],"improve":[string],"corrected":string,"encouragement":string}. "corrected" is a model summary of THIS passage. Keep language simple, specific and encouraging.`
+      : `You are a kind Ghanaian English teacher marking COMPREHENSION answers. The student read a passage and answered questions. For each answer judge: is it correct per the passage, brief, in the student's own words, and not just a repeat of the question? Output ONLY minified JSON: {"score":number 0-100,"strengths":[string],"improve":[string],"corrected":string,"encouragement":string}. In "corrected", give the correct short answer to EACH question, numbered. Reference the student's actual answers. Keep it simple, specific and kind.`;
+    const old=mp.innerHTML; mp.disabled=true; mp.innerHTML='<span class="spinner"></span> Marking…';
+    try{
+      const txt=await callClaude(sys, `PASSAGE TITLE: ${p.title}\n\nPASSAGE:\n${p.text}\n\n${answersBlock}`, "mark");
+      const data=extractJSON(txt);
+      $("#passFb").innerHTML=renderFeedback(data);
+      state.practiceDone++; persist();
+      $("#passFb").scrollIntoView({behavior:"smooth",block:"start"});
+    }catch(e){
+      $("#passFb").innerHTML=`<div class="ai-note">⚠️ Couldn't reach the AI marker. This needs an internet connection (and the AI proxy on a real device). <br><small>(${esc(e.message)})</small></div>`;
+    }
+    mp.disabled=false; mp.innerHTML=old;
+  };
+
+  // task
+  const ta=$("#answer");
+  if(ta){
+    const wc=$("#wc");
+    ta.oninput=()=>{ const w=ta.value.trim()? ta.value.trim().split(/\s+/).length:0; wc.textContent=w+" word"+(w===1?'':'s'); };
+  }
+  const rv=$("#revealBtn");
+  if(rv) rv.onclick=()=>{
+    const ap=activePractice(); if(!ap) return;
+    $("#revealArea").innerHTML=buildReveal(ap.ptype, ap.task);
+    rv.textContent="Model revealed below ↓"; rv.disabled=true;
+    if(!rv._counted){ state.practiceDone++; rv._counted=true; persist(); }
+    bindRubric();
+    bindListenModel();
+    $("#revealArea").scrollIntoView({behavior:"smooth",block:"start"});
+  };
+  // AI writing coach
+  const afb=$("#aiFeedback");
+  if(afb) afb.onclick=async()=>{
+    const ta2=$("#answer"); const ans=ta2? ta2.value.trim():"";
+    if(!ans){ toast("Write your answer first, then ask for feedback."); return; }
+    const ap=activePractice(); if(!ap) return;
+    const task=ap.task; const pt=ap.ptype;
+    const desc = pt==='retype' ? ('The student was asked to re-type this concept accurately (and optionally add a sentence of their own): "'+(task.source||task.model)+'"')
+      : pt==='retypeEx' ? ('The student was asked to re-type this example/model exactly: "'+(task.source||task.model)+'"')
+      : pt==='ownideas' ? ('Instruction: '+task.instruction+' Points given: '+(task.points||[]).join('; '))
+      : pt==='question' ? ('Writing question: '+task.q)
+      : pt==='rewrite' ? (task.weak ? ('Rewrite and improve this weak writing: "'+task.weak+'"') : ('Task: '+task.instruction))
+      : pt==='points' ? ('Read this passage and list its main points: "'+task.passage+'"')
+      : pt==='frompoints' ? ('Instruction: '+task.instruction+' Points given: '+(task.points||[]).join('; '))
+      : ('Essay/writing question: '+task.q);
+    const old=afb.innerHTML; afb.disabled=true; afb.innerHTML='<span class="spinner"></span> Marking…';
+    const sys=`You are a kind, encouraging English writing coach for a secondary-school student in Ghana. The student attempted a writing task. Output ONLY valid minified JSON (no markdown, no commentary) with this schema: {"score":number 0-100,"strengths":[string],"improve":[string],"corrected":string,"encouragement":string}. Reference the student's ACTUAL words. Give 2-3 short strengths and 2-3 short, specific improvements. "corrected" must be an improved version of THEIR writing (not a generic sample). "encouragement" is one warm sentence. Keep language simple and positive.`;
+    try{
+      const txt=await callClaude(sys, `TASK: ${desc}\n\nSTUDENT'S ANSWER: ${ans}`, "mark");
+      const data=extractJSON(txt);
+      $("#fbArea").innerHTML=renderFeedback(data);
+      if(!afb._counted){ state.practiceDone++; afb._counted=true; persist(); }
+      $("#fbArea").scrollIntoView({behavior:"smooth", block:"start"});
+    }catch(e){
+      $("#fbArea").innerHTML=`<div class="ai-note">⚠️ Couldn't reach the AI coach. This feature needs an internet connection and runs live inside Claude. You can still use “Reveal guidance” above. <br><small>(${esc(e.message)})</small></div>`;
+    }
+    afb.disabled=false; afb.innerHTML=old;
+  };
+
+  // Generate a richer, slide-specific practice task with AI (cached for offline reuse)
+  const gf=$("#genFresh");
+  if(gf) gf.onclick=async()=>{
+    const step=currentStep();
+    if(!step || step.type!=='practice'){ return; }
+    const slide=MODULES[step.modIdx].slides[step.slideIdx];
+    const essay = isEssayModule(step.modIdx);
+    const schema = (step.ptype==='retype'||step.ptype==='retypeEx') ? '{"source":string,"instruction":string,"model":string,"rubric":[string]}'
+      : step.ptype==='ownideas' ? '{"points":[string],"instruction":string,"model":string,"rubric":[string]}'
+      : '{"q":string,"model":string,"rubric":[string]}';
+    const kind = {
+      retype: 'a clear one-to-three sentence statement of THIS slide\'s concept for the student to re-type (put it in "source" AND "model")',
+      retypeEx: (essay?'a strong short MODEL piece':'a strong example sentence or two')+' demonstrating this slide\'s concept, for the student to re-type exactly (put it in "source" AND "model")',
+      ownideas: 'a set of 3-5 idea points the student will use to write their OWN '+(essay?'full piece':'short paragraph'),
+      question: 'a single writing question/prompt for the student to '+(essay?'write a FULL piece':'write a short answer')
+    }[step.ptype];
+    const sys=`You are an English writing teacher creating ONE practice task for a secondary-school student in Ghana. The task MUST test ONLY the single concept taught on this slide — do not introduce anything not on this slide. Slide title: "${slide.h}". Slide teaching (the only content to test): "${slide.say}". Create ${kind}, focused strictly on that concept, using a relatable Ghanaian context. Output ONLY valid minified JSON matching exactly: ${schema}. "rubric" is 3-4 short self-check items tied to this slide's concept.`;
+    const old=gf.innerHTML; gf.disabled=true; gf.innerHTML='<span class="spinner"></span> Creating a fresh task…';
+    try{
+      const txt=await callClaude(sys, `Create the ${step.ptype} task now.`);
+      const task=extractJSON(txt); task.generic=false; task.ptype=step.ptype;
+      if(step.ptype==='retype'||step.ptype==='retypeEx'){ task.kind='copy'; if(!task.source) task.source=task.model; if(!task.model) task.model=task.source; }
+      state.pracCache[pracKey(step)]=task; persist();
+      Speech.stop(); render();
+      toast("Fresh task ready ✦");
+    }catch(e){
+      gf.disabled=false; gf.innerHTML=old;
+      toast("Couldn't generate — needs a connection.");
+    }
+  };
+
+  const nt=$("#nextTask");
+  if(nt) nt.onclick=()=>{ state.practiceTaskIndex++; render(); };
+
+  // ---- Account / credits / payments ----
+  updateCreditPill();
+  const cp=$("#creditPill"); if(cp) cp.onclick=()=>{ state._inDeck=false; state._inAIDeck=false; state._inPassages=false; setTab("account"); };
+  const saveApi=$("#saveApi"); if(saveApi) saveApi.onclick=()=>{ const u=($("#apiBase")?.value||"").trim(); state.apiBase=u; persist(); toast(u?"Server saved ✓":"Cleared"); render(); };
+  const changeApi=$("#changeApi"); if(changeApi) changeApi.onclick=()=>{ state.apiBase=""; persist(); render(); };
+  const tl=$("#tabLogin"), tsg=$("#tabSignup");
+  if(tl) tl.onclick=()=>{ state._authMode='login'; render(); };
+  if(tsg) tsg.onclick=()=>{ state._authMode='signup'; render(); };
+  const ag=$("#authGo");
+  if(ag) ag.onclick=async()=>{
+    const phone=($("#authPhone")?.value||"").trim(); const pin=($("#authPin")?.value||"").trim();
+    state._authPhone=phone;
+    const msg=$("#authMsg");
+    if(!phone||!pin){ if(msg){msg.style.display='block'; msg.textContent="Enter your phone and PIN.";} return; }
+    ag.disabled=true; const old=ag.textContent; ag.innerHTML='<span class="spinner"></span> Please wait…';
+    try{
+      const ep = state._authMode==='signup' ? "/auth/signup" : "/auth/login";
+      const data = await api(ep, {method:"POST", body: JSON.stringify({phone, pin})});
+      state.token=data.token; state.account={phone:data.phone, credits:data.credits, unlocked:data.unlocked||[]};
+      persist(); updateCreditPill();
+      toast(state._authMode==='signup'?("Welcome! +"+(data.bonus||0)+" free credits"):"Logged in ✓");
+      render();
+    }catch(e){
+      if(msg){ msg.style.display='block'; msg.textContent="⚠ "+e.message; }
+      ag.disabled=false; ag.textContent=old;
+    }
+  };
+  const rb=$("#refreshBal");
+  if(rb) rb.onclick=async()=>{ try{ const d=await api("/me",{method:"GET"}); state.account.credits=d.credits; state.account.unlocked=d.unlocked||[]; persist(); updateCreditPill(); toast("Balance updated"); render(); }catch(e){ toast(e.message); } };
+  const lo=$("#logout");
+  if(lo) lo.onclick=()=>{ state.token=""; state.account=null; persist(); updateCreditPill(); toast("Logged out"); render(); };
+  document.querySelectorAll("[data-pack]").forEach(b=>b.onclick=async()=>{
+    const amount=+b.dataset.pack;
+    b.disabled=true; const old=b.innerHTML; b.innerHTML='<span class="spinner"></span>';
+    try{
+      const data=await api("/pay/initiate", {method:"POST", body: JSON.stringify({amount})});
+      if(data.link){
+        toast("Opening secure payment…");
+        // open Flutterwave checkout
+        window.open(data.link, "_blank");
+        // remember ref so we can poll on return
+        state._lastTx=data.tx_ref; persist();
+      } else { toast("Couldn't start payment."); }
+    }catch(e){ toast(e.message); }
+    b.disabled=false; b.innerHTML=old;
+  });
+}
+
+function triggerAutoPlay(){
+  if(!state.autoPlay || !Speech.supported) return;
+  if(!document.getElementById("playBtn")) return; // only when a deck slide is on screen
+  const step=currentStep(); if(!step) return;
+  Speech.speak(stepSay(step), ()=>setAudioUI('ended'));
+  setAudioUI('playing');
+}
+
+function bindStudio(){
+  // Save AI proxy URL
+  const tp=$("#testProxy");
+  if(tp) tp.onclick=async()=>{
+    const u=($("#proxyUrl")?.value||"").trim();
+    if(u){ state.proxyUrl=u; persist(); }
+    const st=$("#proxyStatus");
+    if(st){ st.style.display='block'; st.innerHTML='<span class="spinner"></span> Testing AI connection…'; }
+    tp.disabled=true;
+    try{
+      const reply = await callClaude("You are a test. Reply with exactly: OK", "ping");
+      if(st) st.innerHTML = '✓ Connection works! Claude replied. AI features are ready.';
+      toast("AI connected ✓");
+    }catch(e){
+      if(st) st.innerHTML = '⚠ '+esc(e.message);
+      toast("Test failed");
+    }finally{ tp.disabled=false; }
+  };
+  const sp=$("#saveProxy");
+  if(sp) sp.onclick=()=>{
+    const u=($("#proxyUrl")?.value||"").trim();
+    state.proxyUrl=u; persist();
+    const st=$("#proxyStatus");
+    if(st){ st.style.display='block'; st.innerHTML = u ? '✓ Saved. AI calls now route through your proxy: '+esc(u) : 'Proxy cleared — AI will use the default (works inside Claude only).'; }
+    toast(u?"Connection saved ✓":"Proxy cleared");
+  };
+  const avt=$("#aiVoiceToggle");
+  if(avt) avt.onchange=()=>{
+    state.aiVoice=avt.checked; persist();
+    if(state.aiVoice && !(state.proxyUrl||'').trim()){
+      toast("Set the AI proxy URL above to use AI voice.");
+    } else {
+      toast(state.aiVoice?"AI voice on ✓":"AI voice off — using device voice");
+    }
+  };
+  const tv=$("#ttsVoice");
+  if(tv) tv.onchange=()=>{ state.ttsVoice=tv.value; persist(); };
+  const test=$("#testVoice");
+  if(test) test.onclick=()=>{
+    state.ttsVoice=($("#ttsVoice")?.value)||state.ttsVoice; persist();
+    test.disabled=true; test.textContent="⏳ Generating…";
+    Speech.stop();
+    Speech.speak("Hello! This is your Inkwell narration voice. Let's learn to write well, together.", ()=>{
+      test.disabled=false; test.textContent="▶ Test this voice";
+    });
+  };
+  // Generate a lesson
+  const gl=$("#genLesson");
+  if(gl) gl.onclick=async()=>{
+    const topic=($("#aiTopic")?.value||"").trim();
+    const level=$("#aiLevel")?.value||"Intermediate";
+    if(!topic){ toast("Please type a topic first."); return; }
+    const note=$("#aiNote"); note.style.display='block';
+    note.innerHTML='<span class="spinner"></span> Claude is creating your lesson…';
+    gl.disabled=true;
+    const sys=`You are an expert English writing teacher creating a short, vivid micro-lesson for students in Ghana (level: ${level}). Output ONLY valid minified JSON, no markdown, no commentary. Schema: {"title":string,"slides":[{"badge":string,"h":string,"html":string,"say":string}]}. Rules: produce 6 to 8 slides (more if the topic needs it), building from basics to mastery. The FIRST slide MUST state the lesson objectives: badge "Objectives", heading like "What you will learn", listing 2-4 things the student will be able to do. The LAST slide MUST be a recap: badge "Summary", heading "Summary", briefly recapping the key points. Middle slides use badges like "Concept", "Example" or "Tip". "html" may use ONLY these tags: <p>, <b>, <ul>, <li>, and these blocks: <div class='example good'>GOOD EXAMPLE</div>, <div class='example bad'>BAD EXAMPLE</div>, <div class='callout'><span class='lab'>LABEL</span>tip text</div>. Use relatable Ghanaian examples (markets, school, local names like Ama, Kofi, Yaa). "say" is plain narration text with NO HTML, read aloud naturally; the first slide's narration should begin by stating the objectives, and the last should summarise. Keep each slide concise.`;
+    try{
+      const txt=await callClaude(sys, `Create the lesson for topic: ${topic}`);
+      const lesson=extractJSON(txt);
+      if(!lesson.slides || !lesson.slides.length) throw new Error("empty lesson");
+      state.aiLessons.unshift(lesson);
+      gl.disabled=false; note.style.display='none';
+      Speech.stop();
+      state.deckSource='ai'; state.aiLessonIndex=0; state.slideIndex=0; state._inAIDeck=true;
+      render();
+    }catch(e){
+      gl.disabled=false;
+      note.innerHTML="⚠️ Couldn't generate the lesson. AI features need an internet connection and run live inside Claude.<br><small>("+esc(e.message)+")</small>";
+    }
+  };
+
+  // Open a saved AI lesson
+  document.querySelectorAll("[data-ailesson]").forEach(c=>c.onclick=()=>{
+    Speech.stop();
+    state.deckSource='ai'; state.aiLessonIndex=+c.dataset.ailesson; state.slideIndex=0; state._inAIDeck=true;
+    render();
+  });
+
+  // Tutor chat
+  const ci=$("#chatInput"), cs=$("#chatSend");
+  async function sendChat(){
+    const q=(ci?.value||"").trim(); if(!q) return;
+    state.chat.push({role:'user', text:q}); ci.value='';
+    const box=$("#chat");
+    box.innerHTML=renderChat()+`<div class="msg ai thinking">Thinking…</div>`;
+    box.scrollTop=box.scrollHeight;
+    const sys="You are a warm, encouraging English writing tutor for secondary-school students in Ghana. Answer clearly and briefly (2-5 sentences). Give a tiny concrete example when it helps. Stay positive and simple. Plain text only, no markdown.";
+    const convo=state.chat.map(m=>(m.role==='user'?'Student: ':'Tutor: ')+m.text).join("\n")+"\nTutor:";
+    try{
+      const a=await callClaude(sys, convo);
+      state.chat.push({role:'ai', text:(a||"").trim()});
+    }catch(e){
+      state.chat.push({role:'ai', text:"I can't reach the AI right now — please check your internet. (This tutor works live inside Claude.)"});
+    }
+    box.innerHTML=renderChat(); box.scrollTop=box.scrollHeight;
+    persist();
+  }
+  if(cs) cs.onclick=sendChat;
+  if(ci) ci.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); sendChat(); } };
+}
+
+function bindRubric(){
+  const boxes=document.querySelectorAll("#rubric input");
+  const sb=$("#scorebox");
+  const update=()=>{
+    const total=boxes.length; let n=0; boxes.forEach(b=>{if(b.checked)n++;});
+    sb.classList.add("show");
+    let msg;
+    const pct=Math.round(n/total*100);
+    if(n===total) msg=`🌟 Excellent! ${n}/${total} — you nailed every point. You're ready for the next challenge.`;
+    else if(pct>=60) msg=`👍 Good work — ${n}/${total}. Look at the unticked points and try once more to perfect it.`;
+    else if(n>0) msg=`💪 ${n}/${total} — a solid start. Reread the model answer and revise your work using the checklist.`;
+    else msg=`Tick each box your answer achieved to score yourself.`;
+    sb.textContent=msg;
+  };
+  boxes.forEach(b=>b.onchange=update);
+  update();
+}
+
+function bindListenModel(){
+  const btn=$("#listenModel");
+  if(!btn) return;
+  btn.onclick=()=>{
+    const t=($("#modelText")||{}).value||"";
+    if(!t){ return; }
+    if(btn._playing){ Speech.stop(); btn._playing=false; btn.innerHTML="🔊 Listen"; return; }
+    btn.innerHTML="⏳ …";
+    Speech.speak(t, ()=>{ btn._playing=false; btn.innerHTML="🔊 Listen"; });
+    btn._playing=true; btn.innerHTML="⏸ Stop";
+  };
+}
+
+function setAudioUI(st){
+  const bar=$("#audiobar"), icon=$("#playIcon"), lab=$("#audioLab");
+  if(!bar) return;
+  if(st==="playing"){
+    bar.classList.add("playing");
+    icon.innerHTML='<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
+    lab.textContent="Playing… (tap to pause)";
+  } else if(st==="paused"){
+    bar.classList.remove("playing");
+    icon.innerHTML='<path d="M8 5v14l11-7z"/>';
+    lab.textContent="Paused (tap to resume)";
+  } else { // ended
+    bar.classList.remove("playing");
+    icon.innerHTML='<path d="M8 5v14l11-7z"/>';
+    lab.textContent="Listen again";
+  }
+}
+
+function openModule(i){
+  Speech.stop();
+  state.deckSource='module'; state._inAIDeck=false;
+  state.modIndex=i; state.slideIndex=0; state._inDeck=true;
+  setTab("learn");
+}
+
+/* ================= INIT ================= */
+document.querySelectorAll(".tabbar button").forEach(b=>{
+  b.onclick=()=>{
+    state._inDeck=false; state._inAIDeck=false;
+    if(b.dataset.tab==="practice"){ state.practiceType=null; state._inPassages=false; }
+    setTab(b.dataset.tab);
+  };
+});
+
+function showSplash(){
+  view().innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--ink-soft)">
+    <div class="spinner" style="border-color:rgba(31,70,54,.25);border-top-color:var(--green);width:34px;height:34px;margin:0 auto 16px"></div>
+    <p style="font-family:'Fraunces',serif;font-size:1.1rem;color:var(--green);margin:0">Loading your lessons…</p>
+  </div>`;
+}
+function showLoadError(){
+  const isFile = location.protocol === "file:";
+  const fileHelp = `
+    <div style="text-align:left;background:var(--green-soft);border-radius:12px;padding:14px 16px;margin:14px auto 0;max-width:340px">
+      <p style="margin:0 0 8px;font-weight:600;color:var(--green)">This app must be opened from a web address, not a file.</p>
+      <p style="margin:0 0 6px;font-size:.9rem;color:var(--ink)">You opened it directly from a folder (a <code>file://</code> link), which blocks the lessons from loading. Two easy fixes:</p>
+      <p style="margin:8px 0 4px;font-size:.9rem;color:var(--ink)"><b>1. Put it online (best):</b> drag the whole app folder onto <b>app.netlify.com/drop</b> — you get a link that works on your phone.</p>
+      <p style="margin:0;font-size:.9rem;color:var(--ink)"><b>2. Test on a computer:</b> in the app folder run <code style="background:#fff;padding:1px 5px;border-radius:4px">python3 -m http.server 8000</code> then open <code style="background:#fff;padding:1px 5px;border-radius:4px">http://localhost:8000/inkwell-ai.html</code></p>
+    </div>`;
+  const onlineHelp = `<p style="color:var(--ink-soft);font-size:.92rem">The lesson file (modules.json) must sit in the same folder as this app. Check you're online for the first load.</p>${window._modLoadErr?`<p style="color:var(--ink-soft);font-size:.78rem;margin-top:6px;opacity:.8">Details: ${(''+window._modLoadErr).replace(/[<>]/g,'')}</p>`:''}`;
+  view().innerHTML = `<div style="text-align:center;padding:44px 20px">
+    <div style="font-size:30px">📚</div>
+    <p style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--ink);margin:8px 0 4px">Couldn't load the lessons</p>
+    ${isFile ? fileHelp : onlineHelp}
+    <button class="btn btn-primary" id="retryLoad" style="margin-top:16px">Try again</button>
+  </div>`;
+  const r=document.getElementById("retryLoad"); if(r) r.onclick=boot;
+}
+
+async function boot(){
+  // Register the service worker for offline use (only works over http(s), not file://).
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    navigator.serviceWorker.register("./service-worker.js").then((reg)=>{
+      // Check for updates on each load; when a new SW takes over, reload once.
+      try{ reg.update(); }catch(e){}
+      let reloaded=false;
+      navigator.serviceWorker.addEventListener("controllerchange", ()=>{
+        if(reloaded) return; reloaded=true; location.reload();
+      });
+      reg.addEventListener("updatefound", ()=>{
+        const sw=reg.installing;
+        if(sw) sw.addEventListener("statechange", ()=>{
+          if(sw.state==="installed" && navigator.serviceWorker.controller){ try{ sw.postMessage("skipWaiting"); }catch(e){} }
+        });
+      });
+    }).catch(()=>{});
+  }
+  // Capture the install prompt so we can show our own "Install" button.
+  window._deferredInstall = null;
+  window.addEventListener("beforeinstallprompt", (ev)=>{
+    ev.preventDefault();
+    window._deferredInstall = ev;
+    const b = document.getElementById("installBtn");
+    if (b) b.style.display = "inline-flex";
+  });
+  window.addEventListener("appinstalled", ()=>{
+    window._deferredInstall = null;
+    const b = document.getElementById("installBtn");
+    if (b) b.style.display = "none";
+  });
+  showSplash();
+  await loadModules();
+  if(!MODULES.length){ showLoadError(); return; }
+  loadState();
+  updateCreditPill();
+  render();
+  // If we have a saved session, silently refresh the balance (and detect expiry).
+  if(loggedIn()){
+    api("/me",{method:"GET"}).then(d=>{ if(state.account){ state.account.credits=d.credits; state.account.unlocked=d.unlocked||[]; persist(); updateCreditPill(); } })
+      .catch(e=>{ if(e.code===401){ state.token=""; state.account=null; persist(); updateCreditPill(); } });
+  }
+}
+boot();
+</script>
+</body>
+</html>
